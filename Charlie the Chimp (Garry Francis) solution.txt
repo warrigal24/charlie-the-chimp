@@ -1,0 +1,80 @@
+Charlie the Chimp version 1.0.0
+By Garry Francis
+For web browser
+
+Solution by Garry Francis
+----------------------------------------
+This is a minimal solution. You'll need to EXAMINE lots of things for this solution to make sense. Some optional (but significant) commands are shown in parentheses. You can omit these once you know what to do.
+
+(X TREE) (it looks perfect for climbing)
+(CLIMB TREE) (the gorilla's blocking access to it)
+(X GORILLA) (he's asleep on his back)
+(WAKE GORILLA) (he grunts and continues sleeping)
+GET STICK
+(X IT) (you'd hate to be spanked with that)
+(SPANK GORILLA) (you spank him with your hand, but he doesn't feel a thing)
+(SPANK GORILLA WITH STICK) (his thick hair absorbs the blow, find a soft spot)
+(PUSH GORILLA) (he won't budge, try pulling him instead)
+PULL GORILLA (you expose his bum)
+SLAP GORILLA WITH STICK (he wakes, but he's now angry)
+U
+GET VINE
+(X IT) (it looks quite strong)
+W
+TIE VINE TO BRANCH
+D
+(X ORANGUTAN) (his feet almost reach top of west well at pinnacle of his swing)
+(TALK TO ORANGUTAN) (he's having fun on the swing)
+(X HAY) (it's soft)
+(X CRATE) (it has a hole in it)
+(X HOLE) (it's dark inside)
+(X BUTTON) (you can press it)
+(X SLOT) (there's a room full of bananas on the other side)
+(REACH INTO CRATE) (you expect to get bitten by something)
+PRESS BUTTON (someone puts a banana through the slot)
+GET BANANA
+(X IT) (it's a favourite food of all primates)
+PUT IT IN HOLE (orangutan hops down, reaches into hole for banana & gets stuck)
+PRESS BUTTON
+GET BANANA
+EAT IT (you're left with a banana peel)
+GET ON SWING (time to get swinging)
+SWING IT (your feet nearly touch the roof)
+JUMP ONTO ROOF
+(X SKYLIGHT) (maybe you could open it to see what's below)
+OPEN SKYLIGHT
+(X SKYLIGHT) (you see office, steps and zookeeper watching TV)
+(X VENT) (steps are directly below)
+PUT PEEL IN VENT (it falls onto steps, that looks dangerous)
+E (you jump safely onto the pile of hay)
+PRESS BUTTON (someone fell down the stairs)
+GET ON SWING
+SWING IT
+JUMP ONTO ROOF
+(X SKYLIGHT) (office is empty now, so it's safe to descend)
+D
+X TABLE (you find a hat)
+GET HAT
+(X IT) (it would hide your chimpanzee head)
+S
+(X ZOOKEEPER) (he's wearing a lab coat)
+GET COAT
+(X COAT) (it's a lab coat with a front pocket)
+(X POCKET) (it contains some sunglasses)
+GET SUNGLASSES
+(X IT) (they would hide your chimpanzee eyes)
+(X DOOR) (it's closed)
+OPEN DOOR
+(W) (security guard would recognise your head, so you stay put)
+WEAR HAT (it hides your head)
+(W) (security guard would recognise your eyes, so you stay put)
+WEAR SUNGLASSES (they hide your eyes)
+(W) (security guard would recognise your body, so you stay put)
+WEAR COAT (it hides your body)
+W
+(X GUARD) (he's wearing sunglasses, so hopefully won't recognise you)
+(TALK TO GUARD) (he thinks you've got a bad cough)
+(X HALLWAY) (you're only interested in exit to west)
+(X EXIT) (home, sweet home)
+W
+***THE END***
