@@ -1,0 +1,2351 @@
+﻿######################################
+#  Charlie the Chimp
+#  Copyright © 2020 Garry Francis
+######################################
+loading_screen = title_screen
+start_at = room01
+start_theme = my_theme
+
+######################################
+#  Game Information
+######################################
+game_information {
+   copyright_message = Copyright © 2020 Garry Francis
+   game_name = Charlie the Chimp
+   game_version = 1.0.0
+   short_synopsis = Help Charlie the Chimp return to the chimpanzee enclosure.
+   uuid = a9aacb64-a594-11ea-bb37-0242ac130002
+   written_by = Garry Francis
+   year_of_original = 2020
+   year_of_release = 2020
+}
+
+######################################
+#  Game Settings
+######################################
+game_settings {
+   exit_list_calculation = basic
+   inventory_items_limit_var = inventory_max
+   rewind_enabled = true
+   rollback_enabled = true
+}
+
+######################################
+#  Booleans
+######################################
+booleans {
+   is_door_open : boolean "false";
+   is_on_swing : boolean "false";
+   is_orangutan_stuck : boolean "false";
+   is_refresh : boolean "false";
+   is_skylight_open : boolean "false";
+   is_tyre_swinging : boolean "false";
+   is_zookeeper_asleep : boolean "false";
+}
+
+######################################
+#  Integers
+######################################
+integers {
+   inventory_max : integer_const "5";
+   pocket_item_limit : integer_const "2";
+   turns : integer "0";
+   zookeeper_item_limit : integer "1";
+}
+
+######################################
+#  Strings
+######################################
+strings {
+   message : string "";
+}
+
+######################################
+#  Collections
+######################################
+collections {
+   list_object_buffer : list;
+}
+
+######################################
+#  Locations
+######################################
+locations {
+   room01 : location "This is the gorilla enclosure at Taronga Park Zoo. There's a large tree in the middle of the enclosure and a large glass window to the south." header = "Gorilla Enclosure";
+   room02 : location "You're at the top of a huge tree looking down on the gorilla enclosure. You can see the angry gorilla below. A large branch of the tree extends west to the next enclosure." header = "Tree Top";
+   room03 : location "You're perched on top of a sturdy branch that extends from the trunk of the great tree to the east. 15 metres below, you can see the orangutan enclosure." header = "End of Branch";
+   room04 : location "There's a small tree in the middle of this enclosure and a hanging vine leading to the large branch of another tree overhead. There's a large pile of hay at the bottom of the west wall. Above this is a shiny red button and a small slot." header = "Orangutan Enclosure";
+   room05 : location "You're on the roof top of a building. There's a large skylight on the roof with an air vent nearby. If you peer over the east edge of the roof, you can see the tyre swing and the frustrated orangutan in the enclosure below. You might be able to return there by jumping onto the pile of hay." header = "Roof Top";
+   room06 : location "The zookeeper's office is sparsely furnished. The only things of note are the TV sitting on top of a table and a comfortable chair sitting in front of the TV. There are no windows. The light comes from the skylight overhead. There's also a bell on the wall and some steps leading down to the south." header = "Zookeeper's Office";
+   room07 : location "You're inside the banana storage room. There are some steps leading up to the north and a huge pile of bananas at the bottom of the steps. The zookeeper is lying upside down in the pile of bananas. There's a slot in the east wall and a door to the west marked 'Exit'." header = "Storage Room";
+   room08 : location "You're inside a long hallway with a reception desk. There's an exit to the west marked 'Chimpanzee Enclosure'." header = "Hallway";
+   room09 : location "You're in the chimpanzee enclosure. Home, sweet home." header = "Chimpanzee Enclosure";
+}
+
+######################################
+#  Connections
+######################################
+connections {
+   from, direction, to = [
+      room01, up_oneway, room02,
+
+      room02, west_oneway, room03,
+      room02, down_oneway, room01,
+
+      room03, east_oneway, room02,
+      room03, down_oneway, room04,
+
+      room04, up_oneway, room03,
+      room04, west_oneway, room05,
+
+      room05, east_oneway, room04,
+      room05, down_oneway, room06,
+
+      room06, south_oneway, room07,
+      room06, down_oneway, room07,
+
+      room07, north_oneway, room06,
+      room07, west_oneway, room08,
+      room07, up_oneway, room06,
+
+      room08, east_oneway, room07,
+      room08, west_oneway, room09,
+   ]
+}
+
+######################################
+#  Barriers
+######################################
+barriers {
+   block_large_tree : block_path {
+      from = room01
+      to = room02
+      block_when_exists = sleeping_gorilla
+      show_blocked_exit = false
+      message = The giant gorilla is sleeping in front of the tree. He's blocking the only spot where you can get a good footing to start your climb.
+   }
+   block_hanging_vine : block_path {
+      from = room03
+      to = room04
+      block_when_not_exists  = hanging_vine
+      show_blocked_exit = false
+      message = Do you have a death wish? There's a 15-metre drop to the ground below.
+   }
+   block_roof : block_path {
+      from = room04
+      to = room05
+      block_when_not = is_tyre_swinging
+      show_blocked_exit = false
+      message = You can't go that way.
+   }
+   block_skylight : block_path {
+      from = room05
+      to = room06
+      block_when_not = is_skylight_open
+      show_blocked_exit = false
+      message = It might help if you open the skylight first.
+   }
+   
+}
+
+######################################
+#  Objects
+######################################
+# Arranged by room, then scenery within room in alphabetical order, then objects within room in initial display order
+objects {
+   // Room 1: Gorilla Enclosure
+   glass_window : scenery "a glass window" at = "room01" conspicuous = "false";
+   gorilla_enclosure : scenery "a gorilla enclosure" at = "room01" conspicuous = "false";
+   gorillas_bum : scenery "the gorilla's bum" adjective = "gorilla's" conspicuous = "false";
+   large_tree : scenery "a large tree" at = "room01" conspicuous = "false";
+   tall_walls : scenery "some tall walls" at = "room01" conspicuous = "false";
+   taronga_zoo : scenery "Taronga Park Zoo" at = "room01" adjective = "park" conspicuous = "false";
+   sleeping_gorilla : object "a sleeping gorilla" at = "room01";
+   angry_gorilla : object "an angry gorilla";
+   bamboo_stick : object "a bamboo stick" at = "room01";
+   
+   // Room 2: Tree Top
+   gorilla_02 : scenery "the gorilla" at = "room02" conspicuous = "false";
+   large_branch_02 : scenery "a large branch" at = "room02" conspicuous = "false";
+   tall_walls_02 : scenery "some tall walls" at = "room02" conspicuous = "false";
+   tree_top : scenery "the tree top" at = "room02" conspicuous = "false";
+   vine : object "a vine" at = "room02";
+
+   // Room 3: End of Branch
+   hanging_vine : scenery "a hanging vine" conspicuous = "false";
+   large_branch_03 : scenery "a large branch" at = "room03" conspicuous = "false";
+   large_tree_03 : scenery "a large tree" at = "room03" conspicuous = "false";
+
+   // Room 4: Orangutan Enclosure
+   hanging_vine_04 : scenery "a hanging vine" at = "room04" conspicuous = "false";
+   hay : scenery "a pile of hay" at = "room04";
+   hole : scenery "a hole" at = "room04" conspicuous = "false" container_type = "bag";
+   orangutan_enclosure : scenery "an orangutan enclosure" at = "room04" conspicuous = "false";
+   red_button : scenery "a shiny red button" at = "room04" conspicuous = "false";
+   roof : scenery "a roof" at = "room04" conspicuous = "false";
+   slot : scenery "a slot" at = "room04" conspicuous = "false";
+   small_branch : scenery "a small branch" at = "room04" conspicuous = "false";
+   small_tree : scenery "a small tree" at = "room04" conspicuous = "false";
+   banana : object "a banana";
+   banana_peel : object "a banana peel";
+   crate : scenery "a crate" at = "room04";
+   orangutan : scenery "an orangutan" at = "room04";
+   tyre_swing : scenery "a tyre swing" at = "room04";
+   
+   // Room 5: Roof Top
+   air_vent : scenery "an air vent" at = "room05" conspicuous = "false";
+   building : scenery "a building" at = "room05" conspicuous = "false";
+   hay_05 : scenery "a pile of hay" at = "room05" conspicuous = "false";
+   office_05 : scenery "inside of an office" at = "room05" conspicuous = "false";
+   orangutan_05 : scenery "an orangutan" at = "room05" conspicuous = "false";
+   roof_top : scenery "a roof top" at = "room05" conspicuous = "false";
+   skylight : scenery "a skylight" at = "room05" conspicuous = "false";
+   tyre_swing_05 : scenery "a tyre swing" at = "room05" conspicuous = "false";
+   zookeeper_05 : object "a zookeeper" at = "room05" conspicuous = "false";
+   
+   // Room 6: Zookeeper's Office
+   bell : scenery "a bell on the wall" at = "room06" conspicuous = "false";
+   chair : scenery "a chair" at = "room06";
+   ladder : scenery "ladder" at = "room06";
+   light : scenery "the light" at = "room06" conspicuous = "false";
+   office : scenery "an office" at = "room06" conspicuous = "false";
+   skylight_06 : scenery "a skylight" at = "room06" conspicuous = "false";
+   steps_06 : scenery "some steps" at = "room06" conspicuous = "false";
+   table : scenery "a table" at = "room06";
+   television_set : scenery "a television set" at = "room06";
+   hat : object "a hat" wearable = "true" weight = "2";
+   
+   // Room 7: Storage Room
+   bananas : scenery "a pile of bananas" at = "room07" conspicuous = "false";
+   door : scenery "an exit door" at = "room07" conspicuous = "false";
+   slot_07 : scenery "a slot" at = "room07" conspicuous = "false";
+   steps_07 : scenery "some steps" at = "room07" conspicuous = "false";
+   storage_room : scenery "a storage room" at = "room07" conspicuous = "false";
+   unconscious_zookeeper : scenery "an unconscious zookeeper" at = "room07" container_type = "surface";
+   lab_coat : object "a lab coat" at = "unconscious_zookeeper" wearable = "true" weight = "2";
+   pocket : scenery "a pocket" at = "lab_coat" container_type = "bag" conspicuous = "false";
+   sunglasses : object "some sunglasses" at = "pocket" wearable = "true" weight = "1";
+   
+   // Room 8: Hallway
+   exit : scenery "an exit" at = "room08" conspicuous = "false";
+   hallway : scenery "a hallway" at = "room08" conspicuous = "false";
+   reception_desk : scenery "a reception desk" at = "room08" conspicuous = "false";
+   security_guard : scenery "a security guard" at = "room08";
+}
+
+######################################
+#  On Startup
+######################################
+on_startup {
+   : print "^c^<Charlie the Chimp<14>>";
+   : print "It's a beautiful day in the gorilla enclosure at Taronga Park Zoo. There's only one problem. You're not a gorilla, you're a chimpanzee named Charlie. Some idiot zookeeper has mistaken you for a baby gorilla and put you in the wrong enclosure.";
+   : print "You need to find your way back home to the chimpanzee enclosure before the gorilla wakes up and sits on you. Or worse!";
+   : print "^r^[[Press any key to begin]]";
+   : press_any_key;
+}
+
+######################################
+#  On Command
+######################################
+on_command {
+   // : match "_ _" {
+   //    : mask {
+   //       : print {("original_noun1 = " + original_noun1() + ", original_noun2 = " + original_noun2())}
+   //       : print {("s1 = " + s1() + ", s2 = " + s2())}
+   //    }
+   // }
+   // Checks for diagonal movement
+   : match "ne _;nw _;se _;sw _" {
+      : print "There are no diagonal directions in this game.";
+      : done;
+   }
+   : match "w _" {
+      : if (is_at "room08") {
+         : clear_screen;
+         : print "<Congratulations!<12>> You've found your way back home to the chimpanzee enclosure.\n\n";
+         : print "Learn to write your own text adventure with <Adventuron<#r>>. Visit the <web site<13>>[https://adventuron.io/] for further details.";
+         : win_game;
+      }
+   }
+   : match "u _" {
+      : if (is_on_swing) {
+         : print "You'll have to get off the swing first.";
+         : done;
+      }
+   }
+   : match "d _" {
+      : if (is_on_swing) {
+         : set_sentence "exit swing";
+      }
+   }
+
+   // Self
+   : match "examine me" {
+      : print "You're a mischievous chimpanzee named Charlie. Just at the moment, your only concern is getting back home to the chimpanzee enclosure.";
+      : done;
+   }
+   : match "take me" {
+      : print "You've already got you.";
+      : done;
+   }
+
+   // Room 1: Gorilla Enclosure
+   // Glass window
+   : if (is_present "glass_window") {
+      : match "examine window" {
+         : print "This is where the visitors to the zoo watch you. It's made of really thick, unbreakable glass. There's no way to get out that way.";
+      }
+      : match "break window;hit window" {
+         : print "You pound on it, but you just hurt your hand. Ouch!";
+         : done;
+      }
+   }
+   // Gorilla enclosure
+   : if (is_present "gorilla_enclosure") {
+      : match "examine enclosure" {
+         : print "It's a large enclosure surrounded by tall walls. The gorilla has plenty of room to move around, but can't get out.";
+         : done;
+      }
+   }
+   // Gorilla's bum
+   : if (is_present "gorillas_bum") {
+      : match "examine bum" {
+         : print "It looks somewhat tender compared to the rest of him.";
+         : done;
+      }
+      : match "examine back" {
+         : print "He sure is hairy.";
+         : done;
+      }
+      : match "feel bum" {
+         : print "It feels soft.";
+         : done;
+      }
+      : match "smell bum" {
+         : print "No way!";
+         : done;
+      }
+   }
+   // Large tree
+   : if (is_present "large_tree") {
+      : match "examine tree" {
+         : print "It's a large tree that looks perfect for climbing.";
+         : done;
+      }
+      : match "u _;climb tree" {
+         : if (is_present "angry_gorilla") {
+            : goto "room02";
+            : redescribe;
+         }
+         : print "The giant gorilla is sleeping in front of the tree. He's blocking the only spot where you can get a good footing to start your climb.";
+         : done;
+      }
+   }
+   // Tall walls
+   : if (is_present "tall_walls") {
+      : match "examine walls" {
+         : print "They're too tall to climb. The one to the south has a large glass window.";
+         : done;
+      }
+      : match "climb walls" {
+         : print "They're too tall to climb. There are no good hand or foot holds and you just keep sliding back down.";
+         : done;
+      }
+   }
+   // Taronga Park Zoo
+   : if (is_present "taronga_zoo") {
+      : match "examine zoo" {
+         : print "This is your home, except that you're in the wrong enclosure.";
+         : done;
+      }
+   }
+   // Sleeping gorilla
+   : if (is_present "sleeping_gorilla") {
+      : match "examine gorilla" {
+         : append "He's a big, hairy 180 kg gorilla lying asleep ";
+         : if (is_present "gorillas_bum") {
+            : print "on his side with his rump exposed.";
+            : done;
+         }
+         : print "on his back.";
+         : done;
+      }
+      : match "attack gorilla" {
+         : print "Not even your strongest punches can wake a 180 kg gorilla.";
+         : done;
+      }
+      : match "take gorilla" {
+         : print "Are you trying to pick up a 180 kg gorilla? Man, whoever said chimps are smart? The gorilla grumbles and continues sleeping.";
+         : done;
+      }
+      : match "hit gorilla;hit bum" {
+         : if (preposition_is "" && noun2_is "") {
+            : print {("You " + original_verb() + " the gorilla with your hand, but he doesn't feel a thing.")}
+            : done;
+        }
+         : if (preposition_is "with" && noun2_is "stick" && is_carried "bamboo_stick") {
+            : if (is_present "gorillas_bum") {
+               : swap o1 = "sleeping_gorilla" o2 = "angry_gorilla";
+               : set_graphic graphic = "room01b" target = "room01";
+               : set_string var = "message" text = "You take a good swing and whack the giant gorilla square on the buttocks. He wakes with a giant roar and birds squawk in panic as they fly away from the tree.\nYou whistle quietly to yourself while backing away and hide the bamboo stick behind your back.";
+               : gosub "refresh";
+            }
+            : print "The gorilla's thick hair absorbs the blow and he continues sleeping. If only he had a soft spot.";
+            : done;
+         }
+      }
+      : match "kiss gorilla" {
+         : print "Ptew! Now you've got a mouthful of gorilla hair.";
+         : done;
+      }
+      : match "pull gorilla" {
+         : set_string var = "message" text = "You stand in front of the gorilla and pull him by the arm";
+         : if (is_present "gorillas_bum") {
+            : set_string var = "message" {(message + ", but you can't pull him any further. Maybe you could push him instead.")}
+            : print {(message)}
+            : done;
+         }
+         : create "gorillas_bum";
+         : set_graphic graphic = "room01a" target = "room01";
+         : set_string var = "message" {(message + ". You manage to roll him onto his side to expose his derriere.")}
+         : gosub "refresh";
+      }
+      : match "push gorilla" {
+         : set_string var = "message" text = "You stand in front of the gorilla and give him a good shove. ";
+         : if (is_present "gorillas_bum") {
+            : destroy "gorillas_bum";
+            : set_graphic graphic = "room01" target = "room01";
+            : set_string var = "message" {(message + "You manage to roll him onto his back. Maybe you do have some manners after all.")}
+            : gosub "refresh";
+         }
+         : set_string var = "message" {(message + "Ooph! He won't budge. Maybe you could pull him instead.")}
+         : print {(message)}
+         : done;
+      }
+      : match "search gorilla" {
+         : print "Nothing but more gorilla.";
+         : done;
+      }
+      : match "smell gorilla" {
+         : print "Phew. He smells like a musty old rug.";
+         : done;
+      }
+      : match "wake gorilla" {
+         : print "He grunts and continues sleeping.";
+         : done;
+      }
+   }
+   // Angry gorilla
+   : if (is_present "angry_gorilla") {
+      : match "examine gorilla" {
+         : print "He's awake and he's pacing around the enclosure. He looks angry. I wonder why.";
+         : done;
+      }
+      : match "attack gorilla" {
+         : print "You can't be serious. That's a 180 kg gorilla you know.";
+         : done;
+      }
+      : match "take gorilla" {
+         : print "Are you trying to pick up a 180 kg gorilla? Man, whoever said chimps are smart?";
+         : done;
+      }
+      : match "hit gorilla;hit bum" {
+         : if (preposition_is "" && noun2_is "") {
+            : print {("You " + original_verb() + " the gorilla with your hand, but he doesn't feel a thing.")}
+            : done;
+         }
+         : if (preposition_is "with" && noun2_is "stick" && is_carried "bamboo_stick") {
+            : print "That wasn't such a good idea. Now the gorilla knows who woke him up. He goes into a rage and beats you to a pulp. You hear your mother's voice in the back of your mind, \"How many times have I told you not to spank a 180 kg gorilla?\"";
+            : done;
+         }
+      }
+      : match "kiss gorilla" {
+         : print "Aw, shucks. The gorilla returns your affection by damn near squeezing you to death. You'd better not try that again.";
+         : done;
+      }
+      : match "pull gorilla" {
+         : print "He thinks you want to wrestle, so he falls on top of you. You can't breathe! Fortunately, he stands up again and beats his chest in victory. You'd better not try that again.";
+         : done;
+      }
+      : match "push gorilla" {
+         : print "He thinks you want to play, so he pushes you back across the enclosure. You pick yourself up and dust yourself off. You'd better not try that again.";
+         : done;
+      }
+      : match "search gorilla" {
+         : print "Nothing but more gorilla.";
+         : done;
+      }
+      : match "smell gorilla" {
+         : print "Phew. He smells like a musty old rug.";
+         : done;
+      }
+      : match "wake gorilla" {
+         : print "He's already awake. You'd better keep your distance.";
+         : done;
+      }
+   }
+   // Bamboo stick
+   : if (is_present "bamboo_stick") {
+      : match "examine stick" {
+         : print "It's a small piece of bamboo, a favourite food of gorillas. You find yourself thinking, \"Gee, I'd hate to be spanked with that.\"";
+         : done;
+      }
+   }
+   : if (is_carried "bamboo_stick") {
+      : match "drop stick;put stick" {
+         : if (is_at "room04" && preposition_is "in" && noun2_is "slot") {
+            : create "bamboo_stick" target = "room07";
+            : print "It falls through the slot and drops to the floor on the other side of the wall.";
+            : done;
+         }
+         : if (is_at "room04" && preposition_is "in" && (noun2_is "hole" || noun2_is "crate") && is_orangutan_stuck) {
+            : print "The orungutan's blocking the hole.";
+            : done;
+         }
+         : if (is_at "room04" && preposition_is "in" && (noun2_is "hole" || noun2_is "crate")) {
+            : insert_in_container "hole";
+            : print "You hear it drop to the bottom of the crate.";
+            : done;
+         }
+         : if (is_at "room05" && preposition_is "in" && noun2_is "vent") {
+            : create "bamboo_stick" target = "room07";
+            : print "It falls through the vent and bounces down the steps.";
+            : done;
+         }
+         : if (is_at "room05" && preposition_is "in" && noun2_is "skylight" && is_skylight_open && is_zookeeper_asleep) {
+            : create "bamboo_stick" target = "room06";
+            : print "It falls through the skylight and bounces onto the office floor.";
+            : done;
+         }
+         : if (is_at "room05" && preposition_is "in" && noun2_is "skylight" && is_skylight_open) {
+            : create "bamboo_stick" target = "room06";
+            : goto "room01";
+            : print "It falls through the skylight and hits the zookeeper on the head. Oh, oh. The zookeeper looks up and sees you. \"How did you get out, young fella? Back to the enclosure you go.\" He climbs a ladder and takes you back to the gorilla enclosure.";
+            : press_any_key;
+            : redescribe;
+         }
+      }
+      : match "give stick;show stick" {
+         : if (is_present "sleeping_gorilla") {
+            : print "You'll have to wake him first.";
+            : done;
+         }
+         : if (is_present "angry_gorilla") {
+            : destroy;
+            : print "The gorilla snatches the bamboo stick from you, chews it until it's nice and soft, then gobbles it down.";
+            : done;
+         }
+      }
+   }
+   
+   // Room 2: Tree Top
+   // Gorilla
+   : if (is_present "gorilla_02") {
+      : match "examine gorilla" {
+         : print "He's pacing around and rubbing his hind quarters.";
+         : done;
+      }
+   }
+   // Large branch
+   : if (is_present "large_branch_02") {
+      : match "examine branch" {
+         : print "It extends over the wall to the west.";
+         : done;
+      }
+   }
+   // Tall walls
+   : if (is_present "tall_walls_02") {
+      : match "examine walls" {
+         : print "They surround the enclosure below.";
+         : done;
+      }
+      : match "climb walls" {
+         : print "You're not on the walls.";
+         : done;
+      }
+   }
+   // Tree top
+   : if (is_present "tree_top") {
+      : match "examine top;examine tree" {
+         : print "You're at the top of the tree. You can't go any further.";
+         : done;
+      }
+      : match "climb tree" {
+         : goto "room01";
+         : redescribe;
+      }
+   }
+   // Vine
+   : if (is_present "vine") {
+      : match "examine vine" {
+         :print "It's a long piece of vine that looks quite strong.";
+         : done;
+      }
+      : match "untie vine" {
+         : print "It's not tied to anything.";
+         : done;
+      }
+   }
+   : if (is_carried "vine") {
+      : match "tie vine" {
+         : if (preposition_is "to" && noun2_is "branch" && is_present "large_branch_02") {
+            : print "The branch is too thick here. Maybe try it further to the west where the branch is thinner.";
+            : done;
+         }
+         : if (preposition_is "to" && noun2_is "branch" && is_present "large_branch_03") {
+            : destroy "vine";
+            : create "hanging_vine";
+            : set_graphic graphic = "room03a" target = "room03";
+            : set_string var = "message" text = "You tie the vine to the branch and it dangles to the ground below.";
+            : gosub "refresh";
+         }
+      }
+   }
+
+   // Room 3: End of Branch
+   // Large branch
+   : if (is_present "large_branch_03") {
+      : match "examine branch" {
+         : append "It looks like a rather sturdy branch.";
+         : if (is_present "hanging_vine") {
+            : append " There's a vine tied around it that hangs into the enclosure below.";
+         }
+         : print "";
+         : done;
+      }
+   }
+   // Large tree
+   : if (is_present "large_tree_03") {
+      : match "examine tree" {
+         : print "It's in the gorilla enclosure to the east.";
+         : done;
+      }
+   }
+   // Hanging vine
+   : if (is_present "hanging_vine") {
+      : match "examine vine" {
+         : print "It's tied to the branch and dangles to the ground below.";
+         : done;
+      }
+      : match "climb vine" {
+         : goto "room04";
+         : redescribe;
+      }
+      : match "take vine" {
+         : print "You'll have to untie it first.";
+         : done;
+      }
+      : match "untie vine" {
+         : swap o1 = "vine" o2 = "hanging_vine";
+         : pocket "vine";
+         : set_graphic graphic = "room03" target = "room03";
+         : set_string var = "message" text = "You untie the vine from the branch and hang on to it tightly. Don't drop it.";
+         : gosub "refresh";
+      }
+   }
+   
+   // Room 4: Orangutan Enclosure
+   // Hanging vine
+   : if (is_present "hanging_vine_04") {
+      : match "examine vine" {
+         : print "It's a long vine dangling from the branch above.";
+         : done;
+      }
+      : match "climb vine" {
+         : goto "room03";
+         : redescribe;
+      }
+      : match "take vine" {
+         : print "It's securely tied to the branch above. For a chimpanzee, you sure tie one heck of a knot.";
+         : done;
+      }
+      : match "untie vine" {
+         : print "You can't untie it from down here.";
+         : done;
+      }
+   }
+   // Hay
+   : if (is_present "hay") {
+      : match "examine hay" {
+         : print "It looks nice and soft. It might be the orangutan's bed, so you'd better leave it alone.";
+         : done;
+      }
+      : match "take hay" {
+         : print "You'd better leave it along. It might be the orangutan's bed.";
+         : done;
+      }
+      : match "search hay" {
+         : print "Nothing but hay. Sorry.";
+         : done;
+      }
+   }
+   // Hole in crate
+   : if (is_present "hole") {
+      : match "examine hole;search hole" {
+         : if (is_orangutan_stuck) {
+            : print "The orungutan's blocking the hole.";
+            : done;
+         }
+         : print "It's too dark to see what's inside.";
+         : done;
+      }
+      : match "climb hole;enter hole" {
+         : if (is_orangutan_stuck) {
+            : print "The orungutan's blocking the hole.";
+            : done;
+         }
+         : print "You can't fit your chimpanzee-sized body through a fist-sized hole.";
+         : done;
+      }
+      : match "reach hole" {
+         : if (is_orangutan_stuck) {
+            : print "The orungutan's blocking the hole.";
+            : done;
+         }
+         : print "You reach into the hole, expecting to get bitten by something.";
+         : done;
+      }
+   }
+   // Orangutan enclosure
+   : if (is_present "orangutan_enclosure") {
+      : match "examine enclosure" {
+         : print "It's a large enclosure surrounded by tall walls. The orangutan has plenty of room to move around, but can't get out.";
+         : done;
+      }
+   }
+   // Red button
+   : if (is_present "red_button") {
+      : match "examine button" {
+         : print "It's shiny and it's red and it's a button, so you can probably press it.";
+         : done;
+      }
+      : match "press button;push button" {
+         : set_string var = "message" text = "You hear a bell ring inside, then ";
+         : if (is_zookeeper_asleep) {
+            : set_string var = "message" {(message + "silence.")}
+            : print {(message)}
+            : done;
+         }
+         : set_string var = "message" {(message + "someone comes stomping down the stairs. ")}
+         : if (parent_of "banana_peel" == "room07") {
+            : set_true "is_zookeeper_asleep";
+            : set_string var = "message" {(message + "\"Ahhhh!\" Thud! It sounds like someone fell down the stairs. I don't think you're going to get your banana this time.")}
+            : print {(message)}
+            : done;
+         }
+         : set_string var = "message" {(message + "After a short delay, you hear a voice say, ")}
+         : if (is_exists "banana") {
+            : set_string var = "message" {(message + "\"Hey little buddy, you've already got a banana.\"")}
+            : print {(message)}
+            : done;
+         }
+         : create "banana";
+         : set_string var = "message" {(message + "\"Here ya go little fella.\" A banana slides out of the slot and onto the ground.")}
+         : gosub "refresh";
+      }
+   }
+   // Roof top
+   : if (is_present "roof") {
+      : match "examine roof" {
+         : print "It looks like a typical zoo roof.";
+         : done;
+      }
+      : match "climb roof;get roof;jump roof" {
+         : if (preposition_is "on") {
+            : set_sentence "enter roof";
+         }
+      }
+      : match "w _;enter roof" {
+         : if (is_on_swing && is_tyre_swinging) {
+            : set_false "is_on_swing";
+            : set_false "is_tyre_swinging";
+            : goto "room05";
+            : set_string var = "message" text = "Kowabunga! You launch from the swing and easily jump onto the roof top.";
+            : gosub "refresh";
+         }
+         : if (is_on_swing) {
+            : print "You don't have enough momentum.";
+            : done;
+         }
+         : print "You can't reach the roof from the ground. It's way too high.";
+         : done;
+      }
+   }
+   // Slot
+   : if (is_present "slot") {
+      : match "examine slot" {
+         : print "When you look through the slot, you can barely make out a room full of bananas on the other side.";
+         : done;
+      }
+      : match "reach slot;reach banana;reach bananas" {
+         : print "Nice try, but the bananas are out of reach.";
+         : done;
+      }
+   }
+   // Small branch
+   : if (is_present "small_branch") {
+      : match "examine branch" {
+         : print "There's a tyre swing hanging from it.";
+         : done;
+      }
+      : match "climb branch" {
+         : print "It's out of your reach.";
+         : done;
+      }
+   }
+   // Small tree
+   : if (is_present "small_tree") {
+      : match "examine tree" {
+         : print "It's a small tree with smooth bark. It only has one branch with a tyre swing hanging from it.";
+         : done;
+      }
+      : match "climb tree" {
+         : print "It's far too slippery to climb.";
+         : done;
+      }
+   }
+   // Banana
+   : if (is_present "banana") {
+      : match "examine banana" {
+         : print "It's a small banana, a favourite food of all primates.";
+         : done;
+      }
+   }
+   : if (is_carried "banana") {
+      : match "drop banana" {
+         : if (is_at"room04" && !is_orangutan_stuck) {
+            : destroy;
+            : set_string var = "message" text = "The orangutan runs over and grabs the banana. \"Aren't you gonna eat that mate?\" Before you can blink, he's gobbled down the banana and is back on the tyre swing again. ";
+            : if (is_exists "banana_peel") {
+               : set_string var = "message" {(message + "He throws the banana peel away.")}
+               : print {(message)}
+               : done;
+            }
+            : create "banana_peel";
+            : set_string var = "message" {(message + "He drops the banana peel on the ground.")}
+            : gosub "refresh";
+         }
+      }
+      : match "eat banana" {
+         : destroy;
+         : append "You peel the banana and eat it. Mmm, that tasted great. ";
+         : if (is_exists "banana_peel") {
+            : print "You throw the banana peel away.";
+            : done;
+         }
+         : pocket "banana_peel";
+         : print "You decide to keep the banana peel, as it may come in handy for something.";
+         : done;
+      }
+      : match "give banana" {
+         : if (is_present "orangutan" && is_orangutan_stuck) {
+            : print "\"Thanks, mate, but I've already got one in this 'ere crate.\"";
+            : done;
+         }
+         : if (is_present "orangutan") {
+            : destroy;
+            : append "\"Oi, thanks for the 'nana mate.\" The orangutan devours the banana and .";
+            : if (is_exists "banana_peel") {
+               : print "throws the peel away.";
+            }
+            : create "banana_peel";
+            : print "drops the peel on the ground.";
+            : done;
+         }
+      }
+      : match "insert banana" {
+         : if (is_at "room04" && preposition_is "in" && noun2_is "slot") {
+            : destroy;
+            : print "It falls through the slot. That was pretty silly. Now you'll have to get another one.";
+            : done;
+         }
+         : if (is_at "room04" && preposition_is "in" && (noun2_is "hole" || noun2_is "crate") && is_orangutan_stuck) {
+            : print "The orungutan's blocking the hole.";
+            : done;
+         }
+         : if (is_at "room04" && preposition_is "in" && (noun2_is "hole" || noun2_is "crate")) {
+            : destroy;
+            : set_true "is_orangutan_stuck";
+            : set_graphic graphic = "room04a" target = "room04";
+            : set_string var = "message" text = "\"You're not gonna waste that are ya, mate?\" The orangutan stops swinging, hops down and reaches his hand into the crate to grab the banana. He can't remove his hand from the hole while clutching the banana. He's stuck!";
+            : gosub "refresh";
+         }
+         : if (is_at "room05" && preposition_is "in" && noun2_is "vent") {
+            : destroy;
+            : print "It falls through the vent. That was pretty silly. Now you'll have to get another one.";
+            : done;
+         }
+      }
+      : match "throw banana" {
+         : if (is_present "orangutan" && is_orangutan_stuck) {
+            : drop;
+            : set_string var = "message" text = "\"Oi, stop takin' advantage of someone that's in a predicament.\"";
+            : gosub "refresh";
+         }
+         : if (is_present "orangutan") {
+            : destroy;
+            : set_string var = "message" text = "You throw the banana at the orangutan, but he catches it with ease. \"Thanks for the 'nana mate. I owe ya one.\" The orangutan eats the banana and ";
+            : if (is_exists "banana_peel") {
+               : set_string var = "message" {(message + "throws the peel away.")}
+               : print {(message)}
+               : done;
+            }
+            : create "banana_peel";
+            : set_string var = "message" {(message + "drops the peel on the ground.")}
+            : gosub "refresh";
+         }
+      }
+   }
+   // Banana peel
+   : if (is_beside "banana_peel") {
+      : match "examine peel" {
+         : print "There's a banana peel on the ground. I hope no one slips on it.";
+         : done;
+      }
+   }
+   : if (is_carried "banana_peel") {
+      : match "examine peel" {
+         : print "It's a small slippery banana peel left over from your favourite meal.";
+         : done;
+      }
+      : match "put peel" {
+         : if (preposition_is "in" && noun2_is "skylight" && is_at "room05" && is_skylight_open) {
+            : print "Don't be silly. The zookeeper would be sure to see it, then he would see you.";
+            : done;
+         }
+         : if (preposition_is "in" && noun2_is "skylight" && is_at "room05") {
+            : print "It might help if you open the skylight first.";
+            : done;
+         }
+         : if (preposition_is "in" && noun2_is "vent" && is_at "room05") {
+            : create "banana_peel" target = "room07";
+            : print "The peel lands on the steps below. Uh oh, that looks dangerous.";
+            : done;
+         }
+         : if (preposition_is "in" && noun2_is "slot" && is_at "room04") {
+            : print "It's too squishy to fit through the slot.";
+            : done;
+         }
+         : if (preposition_is "in" && noun2_is "hole" && is_at "room04") {
+            : print "It's too squishy to fit through the hole.";
+            : done;
+         }
+      }
+   }
+   // Crate
+   : if (is_present "crate") {
+      : match "examine crate" {
+         : print "It's quite a big crate with a hole in the side. It was probably put here so the orangutan has something to play on.";
+         : done;
+      }
+      : match "climb crate;get crate;jump crate" {
+         : if (preposition_is "on") {
+            : set_sentence "enter crate";
+         }
+      }
+      : match "climb crate;enter crate" {
+         : if (is_orangutan_stuck) {
+            : print "The orungutan's in the way.";
+            : done;
+         }
+         : print "You climb on top of the crate, but decide that it's not much fun and jump down again.";
+         : done;
+      }
+      : match "lift crate" {
+         : if (is_orangutan_stuck) {
+            : print "The orungutan's in the way.";
+            : done;
+         }
+         : print "It's too heavy to lift.";
+         : done;
+      }
+      : match "pull crate;push crate;turn crate" {
+         : if (is_orangutan_stuck) {
+            : print "The orungutan's in the way.";
+            : done;
+         }
+         : print "It won't budge.";
+         : done;
+      }
+      : match "reach crate" {
+         : if (is_orangutan_stuck) {
+            : print "The orungutan's in the way.";
+            : done;
+         }
+         : print "You reach into the crate, expecting to get bitten by something.";
+         : done;
+      }
+      : match "search crate" {
+         : if (is_orangutan_stuck) {
+            : print "The orungutan's in the way.";
+            : done;
+         }
+         : print "You can only see what's in the crate by looking in the hole.";
+         : done;
+      }
+      : match "take crate" {
+         : if (is_orangutan_stuck) {
+            : print "The orungutan's in the way.";
+            : done;
+         }
+         : print "It's too big and heavy to carry for a little chimpanzee like you.";
+         : done;
+      }
+   }
+   // Orangutan
+   : if (is_present "orangutan") {
+      : match "examine orangutan" {
+         : if (is_orangutan_stuck) {
+            : print "The orangutan has push his hand stuck in a crate. \"I wonder how he did that?\" you chuckle to yourself.";
+            : done;
+         }
+         : print "The orangutan is having a blast swinging on the tyre swing. You notice that his feet almost reach the top of the west wall at the pinnacle of his swing.";
+         : done;
+      }
+      : match "push orangutan" {
+         : if (is_orangutan_stuck) {
+            : print "\"Oi, rack off!\"";
+            : done;
+         }
+         : print "The orangutan hollers with joy as you push him higher on the swing. You notice that his feet almost touch the wall to the west as he swings.";
+         : done;
+      }
+      : match "pull orangutan" {
+         : if (is_orangutan_stuck) {
+            : print "Try as you might, you just can't free the orangutan. \"Tell me mum I love 'er, will ya?\"";
+            : done;
+         }
+         : print "\"Oi, get yer own swing.\"";
+         : done;
+      }
+      : match "talk orangutan" {
+         : if (is_orangutan_stuck) {
+            : print "\"I seem to 'ave got me 'and stuck in this 'ere crate, but I ain't lettin' go of this 'ere banana. No way mate. You'll eat it for sure.\"";
+            : done;
+         }
+         : print "\"G'day mate. This 'ere swing's better 'n a bucket fulla bananas, ay?\"";
+         : done;
+      }
+   }
+   // Tyre swing
+   : if (is_present "tyre_swing") {
+      : match "examine swing" {
+         : print "It's a very simple affair consisting of a rope suspended from the tree branch and tied to a rubber tyre.";
+         : done;
+      }
+      : match "get swing;climb swing;jump swing" {
+         : if (preposition_is "on") {
+            : set_sentence "enter swing";
+         }
+         : if (preposition_is "off") {
+            : set_sentence "exit swing";
+         }
+      }
+      : match "enter swing;mount swing" {
+         : if (is_orangutan_stuck) {
+            : set_true "is_on_swing";
+            : print "You jump onto the tyre swing. Time to get swinging!";
+            : done;
+         }
+         : print "The orangutan is currently using the swing. \"Oi, bugger off you. I'm swingin'.\"";
+         : done;
+      }
+      : match "dismount swing;exit swing" {
+         : if (is_on_swing) {
+            : set_false "is_on_swing";
+            : set_false "is_tyre_swinging";
+            : print "Had enough? You jump off the tyre swing.";
+            : done;
+         }
+         : print "You're not on the swing.";
+         : done;
+      }
+      : match "pull swing;push swing;swing swing" {
+         : if (is_orangutan_stuck && is_on_swing && is_tyre_swinging) {
+            : print "You keep swinging in the tyre to maintain your momentum.";
+            : done;
+         }
+         : if (is_orangutan_stuck && is_on_swing) {
+            : set_true "is_tyre_swinging";
+            : print "You begin swinging in the tyre. You can now see the roof of a building to the west. Your feet nearly touch the roof at the pinnacle of your swing.";
+            : done;
+         }
+         : if (is_orangutan_stuck) {
+            : print "The tyre swings backwards and forwards. Ooh, that looks like fun. Why don't you get on it and give it a try?";
+            : done;
+         }
+         : print "The orangutan hollers with joy as you push him higher on the swing. You notice that his feet almost touch the wall to the west as he swings.";
+         : done;
+      }
+      : match "untie swing" {
+         : print "It's way too tight.";
+         : done;
+      }
+   }
+
+   // Room 5: Roof Top
+   // Air vent
+   : if (is_present "air_vent") {
+      : match "examine vent" {
+         : print "You stick your head in the air vent. Directly below are some steps, but you can't see where they go.";
+         : done;
+      }
+   }
+   // Building
+   : if (is_present "building") {
+      : match "examine building" {
+         : print "You can only see the roof of the building from here. You can't see the rest of it.";
+         : done;
+      }
+   }
+   // Hay
+   : if (is_present "hay_05") {
+      : match "examine hay" {
+         : print "It looks nice and soft.";
+         : done;
+      }
+      : match "jump hay" {
+         : if (preposition_is "on") {
+            : set_sentence "e _";
+         }
+      }
+      : match "e _" {
+         : goto "room04";
+         : set_string var = "message" text = "You jump safely onto the pile of hay.";
+         : gosub "refresh";
+      }
+   }
+   // Office
+   : if (is_present "office_05") {
+      : match "examine office" {
+         : print "You can't see any more of the office or its contents from up here. Maybe you should go inside.";
+         : done;
+      }
+   }
+   // Orangutan
+   : if (is_present "orangutan_05") {
+      : match "examine orangutan" {
+         : print "The orangutan has his hand stuck in a hole in a crate.";
+         : done;
+      }
+   }
+   // Roof top
+   : if (is_present "roof_top") {
+      : match "examine roof;examine top" {
+         : print "It looks rather sturdy.";
+         : done;
+      }
+   }
+   // Skylight
+   : if (is_present "skylight") {
+      : match "examine skylight" {
+         : if (is_skylight_open) {
+            : append "Looking through the skylight, you see an office below. There are some steps leading down at the south of the office, but you can't see where they go. ";
+            : if (is_zookeeper_asleep) {
+               : print "The office is empty.";
+               : done;
+            }
+            : print "There's a zookeeper watching TV. So that's who's been getting the bananas for you.";
+            : done;
+         }
+         : print "It hasn't been cleaned for a while. Maybe you could open it to see what's below.";
+         : done;
+      }
+      : match "open skylight" {
+         : if (is_skylight_open) {
+            : print "It's already open.";
+            : done;
+         }
+         : set_true "is_skylight_open";
+         : set_graphic graphic = "room05a" target = "room05";
+         : set_string var = "message" text = "You open the skylight.";
+         : gosub "refresh";
+      }
+      : match "close skylight" {
+         : if (!is_skylight_open) {
+            : print "It's already closed.";
+            : done;
+         }
+         : set_false "is_skylight_open";
+         : set_graphic graphic = "room05" target = "room05";
+         : set_string var = "message" text = "You close the skylight.";
+         : gosub "refresh";
+      }
+      : match "d _;climb skylight;enter skylight" {
+         : if (is_skylight_open) {
+            : set_string var = "message" text = "You climb through the skylight and drop to the floor below. I hope you weren't planning on going back that way.";
+            : if (is_zookeeper_asleep) {
+               : goto "room06";
+               : gosub "refresh";
+            }
+            : set_string var = "message" {(message + " The zookeeper hears you. \"Hello little fella. How'd you get out? We'd better get you back to your enclosure.\"")}
+            : goto "room01";
+            : print {(message)}
+            : press_any_key;
+            : redescribe;
+         }
+         : print "It might help if you open the skylight first.";
+         : done;
+      }
+   }
+   // Tyre swing
+   : if (is_present "tyre_swing_05") {
+      : match "examine swing" {
+         : print "It's a very simple affair consisting of a rope suspended from the tree branch and tied to a rubber tyre.";
+         : done;
+      }
+   }
+   // Zookeeper
+   : if (is_present "zookeeper_05") {
+      : match "examine zookeeper" {
+         : print "The zookeeper is busy watching TV.";
+         : done;
+      }
+   }
+
+   // Room 6: Zookeeper's Office
+   // Bell on wall
+   : if (is_present "bell") {
+      : match "examine bell" {
+         : print "That must be the bell that you hear ring when you press the red button for a banana.";
+         : done;
+      }
+      : match "hit bell;ring bell" {
+         : print "Ding, ding, ding! That was fun.";
+         : done;
+      }
+   }
+   // Chair
+   : if (is_present "chair") {
+      : match "examine chair" {
+         : print "It's one of those office chairs that spins around.";
+         : done;
+      }
+      : match "enter chair;sit chair" {
+         : print "Whee! You spin round and round on the chair until you feel dizzy and fall off.";
+         : done;
+      }
+   }
+   // Ladder
+   : if (is_present "ladder") {
+      : match "examine ladder" {
+         : print "It's probably used to open and close the skylight.";
+         : done;
+      }
+      : match "climb ladder" {
+         : print "It's in the wrong position. You'll have to move it if you expect to climb up to the skylight.";
+         : done;
+      }
+      : match "take ladder" {
+         : print "It's too big and bulky for a little chimp like you to carry around.";
+         : done;
+      }
+   }
+   // Light
+   : if (is_present "light") {
+      : match "examine light" {
+         : print "It streams in from the skylight overhead.";
+         : done;
+      }
+   }
+   // Office
+   : if (is_present "office") {
+      : match "examine office" {
+         : print "It's sparsely furnished.";
+         : done;
+      }
+   }
+   // Skylight
+   : if (is_present "skylight_06") {
+      : match "examine skylight" {
+         : print "It's open (obviously), but it's out of reach.";
+         : done;
+      }
+   }
+   // Steps
+   : if (is_present "steps_06") {
+      : match "examine steps" {
+         : print "They lead down to the store room.";
+         : done;
+      }
+   }
+   // Table
+   : if (is_present "table") {
+      : match "examine table" {
+         : set_string var = "message" text = "It's a plain wooden table.";
+         : if (has_not_created "hat") {
+            : create "hat";
+            : set_string var = "message" {(message + " You find a hat sitting on it.")}
+            : gosub "refresh";
+         }
+         : print {(message)}
+         : done;
+      }
+   }
+   // Television set
+   : if (is_present "television_set") {
+      : match "examine set" {
+         : print "It's a 34 cm TV playing some Australian soapie.";
+      }
+   }
+   // Hat
+   : if (is_present "hat") {
+      : match "examine hat" {
+         : if (is_worn "hat") {
+            : print "You can't see it while it's sitting on your head.";
+            : done;
+         }
+         : print "It's a broad-brimmed Akubra hat that would help hide your chimpanzee head.";
+         : done;
+      }
+      : match "remove hat" {
+         : if (!is_worn "hat") {
+            : print "You're not wearing it.";
+            : done;
+         }
+         : unwear quiet = "true";
+         : if (is_at "room08") {
+            : goto "room01";
+            : set_string var = "message" text = "The security guard recognises you. \"Hey! You're not Bob, you're the baby gorilla. Back to the gorilla enclosure for you.\"";
+            : print {(message)}
+            : press_any_key;
+            : redescribe;
+         }
+         : print "You remove the hat.";
+         : done;
+      }
+      : match "wear hat" {
+         : if (is_worn "hat") {
+            : print "You're already wearing it.";
+            : done;
+         }
+         : wear quiet = "true";
+         : print "The broad-brimmed Akubra hat hides your head.";
+         : done;
+      }
+   }
+   
+   // Room 7: Storage Room
+   // Bananas
+   : if (is_present "bananas") {
+      : match "examine bananas" {
+         : print "It looks like a pile of perfect yellow bananas. Yum.";
+         : done;
+      }
+   }
+   // Exit door
+   : if (is_present "door") {
+      : match "examine door" {
+         : append "It's a plain grey-painted door that's currently ";
+         : if (is_door_open) {
+            : print "open.";
+            : done;
+         }
+         : print "closed.";
+         : done;
+      }
+      : match "open door" {
+         : if (is_door_open) {
+            : print "It's already open.";
+            : done;
+         }
+         : set_true "is_door_open";
+         : print "You open the door.";
+         : done;
+      }
+      : match "close door" {
+         : if (!is_door_open) {
+            : print "It's already closed.";
+            : done;
+         }
+         : set_false "is_door_open";
+         : print "You close the door.";
+         : done;
+      }
+      : match "e _" {
+         : if (is_at "room08" && !is_door_open) {
+            : print "You'll have to open the door first.";
+            : done;
+         }
+      }
+      : match "w _" {
+         : if (is_at "room07" && !is_door_open) {
+            : print "You'll have to open the door first.";
+            : done;
+         }
+         : append "You poke your head out the door far enough to see a security guard. ";
+         : if (!is_worn "hat") {
+            : print "He will recognise your chimpanzee head for sure, so you pull your head back in.";
+            : done;
+         }
+         : if (!is_worn "sunglasses") {
+            : print "He will recognise your chimpanzee eyes for sure, so you pull your head back in.";
+            : done;
+         }
+         : if (!is_worn "lab_coat") {
+            : print "He will recognise your chimpanzee body for sure, so you pull your head back in.";
+            : done;
+         }
+         : goto "room08";
+         : print "Feeling confident about your disguise, you stroll out into the hallway.";
+         : press_any_key;
+         : redescribe;
+      }
+   }         
+   // Slot
+   : if (is_present "slot_07") {
+      : match "examine slot" {
+         : print "When you look through the slot, you can see the orangutan enclosure on the other side of the wall.";
+         : done;
+      }
+   }
+   // Steps
+   : if (is_present "steps_07") {
+      : match "examine steps" {
+         : print "They lead up to the office.";
+         : done;
+      }
+   }
+   // Storage room
+   : if (is_present "storage_room") {
+      : match "examine room" {
+         : print "It has a huge pile of bananas at the bottom of the steps.";
+         : done;
+      }
+   }
+   // Zookeeper
+   : if (is_present "unconscious_zookeeper") {
+      : match "examine zookeeper" {
+         : append "The zookeeper is wearing ";
+         : look_inside
+            of = "unconscious_zookeeper"
+            extract_the = "description"
+            store_results_in = "list_object_buffer"
+            make_known = "true";
+         : print_list_verbose "list_object_buffer" lead_in = "" when_empty = "nothing out of the ordinary.";
+         : done;
+      }
+      : match "examine zookeeper" {
+         : append "The poor zookeeper is knocked out cold. \"Humans really should be more careful\", you think to yourself.";
+         : if (has_not_created "lab_coat") {
+            : append " You notice that he's wearing a fetching white lab coat.";
+         }
+         : print "";
+         : done;
+      }
+      : match "take all" {
+         : if (preposition_is "from" && noun2_is "zookeeper") {
+            : do_all "unconscious_zookeeper";
+            : done;
+         }
+      }
+      : match "take _" {
+         : if (s1_location() == "unconscious_zookeeper" && (preposition_is "from" && noun2_is "zookeeper" || noun2_is "")) {
+            : remove_from_container "unconscious_zookeeper";
+            : done;
+         }
+      }
+      : match "put all" {
+         : if (preposition_is "in" && noun2_is "zookeeper") {
+            : do_all "inventory_notworn";
+            : done;
+         }
+      }
+      : match "put _" {
+         : if (preposition_is "in" && noun2_is "zookeeper") {
+            : if (s1_location() == "unconscious_zookeeper") {
+               : print {("The " + original_noun1() + " is already on the zookeeper.")}
+               : done;
+            }
+            : if (is_beside (s1())) {
+               : pocket;
+               : print {("(First taking the " + original_noun1() +")")}
+            }
+            : if (is_worn (s1())) {
+               : unwear quiet = "true";
+               : print {("(First removing the " + original_noun1() +")")}
+            }
+            : if (s1_location() != "inventory") {
+               : print "You can't see that here.";
+               : done;
+            }
+            : if (weigh(s1()) > 1) {
+               : print {("The " + original_noun1() + " won't fit on the zookeeper.")}
+               : done;
+            }
+            : if (child_count "unconscious_zookeeper" == zookeeper_item_limit) {
+               : print "You can't put any more items on the zookeeper.";
+               : done;
+            }
+            : insert_in_container "unconscious_zookeeper";
+            : done;
+         }
+      }
+   }
+   // Lab coat
+   : if (is_present "lab_coat") {
+      : match "examine coat" {
+         : print "It's a plain white lab coat with a front pocket.";
+         : done;
+      }
+      : match "remove coat" {
+         : if (!is_worn "lab_coat") {
+            : print "You're not wearing it.";
+            : done;
+         }
+         : unwear quiet = "true";
+         : if (is_at "room08") {
+            : goto "room01";
+            : set_string var = "message" text = "The security guard recognises you. \"Hey! You're not Bob, you're the baby gorilla. Back to the gorilla enclosure for you.\"";
+            : print {(message)}
+            : press_any_key;
+            : redescribe;
+         }
+         : print "You remove the lab coat.";
+         : done;
+      }
+      : match "wear coat" {
+         : if (is_worn "lab_coat") {
+            : print "You're already wearing it.";
+            : done;
+         }
+         : wear quiet = "true";
+         : print "The lab coat fits...sort of. At least you look a little more human.";
+         : done;
+      }
+   }
+   // Pocket
+   : if (is_present "pocket") {
+      : match "take all" {
+         : if (noun2_is "pocket") {
+            : do_all "pocket";
+            : done;
+         }
+      }
+      : match "take _" {
+         : if (s1_location() == "pocket" && (noun2_is "pocket" || noun2_is "")) {
+            : remove_from_container "pocket";
+            : done;
+         }
+      }
+      : match "put all" {
+         : if (noun2_is "pocket") {
+            : do_all "inventory_notworn";
+            : done;
+         }
+      }
+      : match "put _" {
+         : if (noun2_is "pocket") {
+            : if (s1_location() == "pocket") {
+               : print {("The " + original_noun1() + " is already in the pocket.")}
+               : done;
+            }
+            : if (is_beside (s1())) {
+               : pocket;
+               : print {("(First taking the " + original_noun1() +")")}
+            }
+            : if (is_worn (s1())) {
+               : unwear quiet = "true";
+               : print {("(First removing the " + original_noun1() +")")}
+            }
+            : if (s1_location() != "inventory") {
+               : print "You can't see that here.";
+               : done;
+            }
+            : if (weigh(s1()) > 1) {
+               : print {("The " + original_noun1() + " won't fit in the lab coat pocket.")}
+               : done;
+            }
+            : if (child_count "pocket" == pocket_item_limit) {
+               : print "You can't put any more items in the lab coat pocket.";
+               : done;
+            }
+            : insert_in_container "pocket";
+            : done;
+         }
+      }
+      : match "examine pocket" {
+         : append "The lab coat pocket contains ";
+         : look_inside
+            of = "pocket"
+            extract_the = "description"
+            store_results_in = "list_object_buffer"
+            make_known = "true";
+         : print_list_verbose "list_object_buffer" lead_in = "" when_empty = "nothing.";
+         : done;
+      }
+   }
+   // Sunglasses
+   : if (is_present "sunglasses") {
+      : match "examine sunglasses" {
+         : if (is_worn "sunglasses") {
+            : print "You can't see them while they're on your head.";
+            : done;
+         }
+         : print "They're a pair of dark sunglasses that would do a good job of hiding your chimpanzee eyes from casual onlookers.";
+         : done;
+      }
+      : match "remove sunglasses" {
+         : if (!is_worn "sunglasses") {
+            : print "You're not wearing them.";
+            : done;
+         }
+         : unwear quiet = "true";
+         : if (is_at "room08") {
+            : goto "room01";
+            : set_string var = "message" text = "The security guard recognises you. \"Hey! You're not Bob, you're the baby gorilla. Back to the gorilla enclosure for you.\"";
+            : print {(message)}
+            : press_any_key;
+            : redescribe;
+         }
+         : print "You remove the sunglasses.";
+         : done;
+      }
+      : match "wear sunglasses" {
+         : if (is_worn "sunglasses") {
+            : print "You're already wearing them.";
+            : done;
+         }
+         : wear quiet = "true";
+         : print "The dark sunglasses hide your eyes.";
+         : done;
+      }
+   }
+
+   // Room 8: Hallway
+   // Chimpanzee enclosure door
+   : if (is_present "exit") {
+      : match "examine exit" {
+         : print "Home, sweet home.";
+         : done;
+      }
+   }
+   // Hallway
+   : if (is_present "hallway") {
+      : match "examine hallway" {
+         : print "It's a long hallway that goes who knows where. The only thing you're interested in is the exit to the west.";
+         : done;
+      }
+   }
+   // Reception desk
+   : if (is_present "reception_desk") {
+      : match "examine desk" {
+         : print "There's a security guard sitting behind the reception desk.";
+         : done;
+      }
+   }
+   // Security guard
+   : if (is_present "security_guard") {
+      : match "examine guard" {
+         : print "He's wearing dark sunglasses, so, hopefully, he won't recognise you.";
+         : done;
+      }
+      : match "talk guard" {
+         : print "\"How's it going Bob?\" asks the security guard. You make a sort of a grunting noise. \"Geez, that sounds like a bad cough you've got Bob. You'd better see a doctor about it.\"";
+         : done;
+      }
+   }
+   
+   // Miscellaneous commands
+   : match "ask -" {
+      : print "\"Hoo, hoo, eek, eek.\"";
+      : done;
+   }
+   : match "ask *" {
+      : if (is_present (s1())) {
+         : print "\"Hoo, hoo, eek, eek.\" There's no response.";
+         : done;
+      }
+   }
+   : match "attack -" {
+      : print {("You'll have to tell me who or what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "attack *" {
+      : if (is_present (s1())) {
+         : print "After a million years of evolution, is that the best you can come up with?";
+         : done;
+      }
+   }
+   : match "close -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "close *" {
+      : if (is_present (s1())) {
+         : print {("You can't " + original_verb() + " that.")}
+         : done;
+      }
+   }
+   : match "dance _" {
+      : print "You're a chimpanzee, not a ballerina.";
+      : done;
+   }
+   : match "drink _" {
+      : print "There's nothing to drink here. There might be something back at the chimpanzee enclosure.";
+      : done;
+   }
+   : match "drop -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "drop *" {
+      : if (is_carried (s1()) && !is_worn (s1())) {
+         : if (is_at "room02") {
+            : create target = "room01";
+            : print {("You drop the " + original_noun1() + " into the enclosure below.")}
+            : done;
+         }
+         : if (is_at "room03") {
+            : create target = "room04";
+            : append {("The " + original_noun1() + " falls to the enclosure below.")}
+            : if (noun1_is "vine") {
+               : append " That's blown it. You'll never get out of here now.";
+            }
+            : print "";
+            : done;
+         }
+         : drop quiet = "true";
+         : set_string var = "message" text = "Dropped.";
+         : gosub "refresh";
+      }
+   }
+   : match "eat -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "eat *" {
+      : if (is_carried (s1())) {
+         : print "If you eat that, it will surely give you indigestion.";
+         : done;
+      }
+   }
+   // : match "examine -" {
+   //    : print {("You'll have to tell me what to " + original_verb() + ".")}
+   //    : done;
+   // }
+   : match "take -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "take *" {
+      : if (is_beside (s1())) {
+         : get quiet = "true";
+         : set_string var = "message" text = "Taken.";
+         : gosub "refresh";
+      }
+   }
+   : match "give -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "give *" {
+      : if (is_worn (s1())) {
+         : print "You'll have to remove it first.";
+         : done;
+      }
+      : if (is_carried (s1())) {
+         : print "Nobody wants that.";
+         : done;
+      }
+   }
+   : match "help _" {
+      : print "If you need help on how to play an adventure, see the instructions. If you need help on how to solve the game, ask Charlie the Chimp. He's obviously smarter than you are.";
+      : done;
+   }
+   : match "hit _" {
+      : if (noun1_is "") {
+         : print {("You'll have to tell me what to " + original_verb() + ".")}
+         : done;
+      }
+      : if (!is_present (s1())) {
+         : print "You can't see that here.";
+         : done;
+      }
+      : if (preposition_is "" && noun2_is "") {
+         // Specific cases go here
+         : if (noun1_is "gorilla" && is_carried "bamboo_stick") {
+            : print "^n^(with the bamboo stick)\n";
+            : set_sentence "hit gorilla with stick";
+         }
+         : else {
+            : print "Ouch! You hurt your hand.";
+            : done;
+         }
+      }
+      : if (preposition_is "with" && noun2_is "") {
+         : print {("You need to tell me what to " + original_verb() + " the " + original_noun1() + " with.")}
+         : done;
+      }
+      : if (preposition_is "with" && !is_carried (s2())) {
+         : print {("You can't " + original_verb() + " the " + original_noun1() + " with something you're not carrying.")}
+         : done;
+      }
+      // Specific cases go here
+      : print {("You " + original_verb() + " the " + original_noun1() + " with the " + original_noun2() + ".")}
+      : done;
+   }
+   : match "kick -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "kick *" {
+      : if (is_present (s1())) {
+         : print "Ow! You hurt your foot.";
+         : done;
+      }
+   }
+   : match "kiss -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "kiss *" {
+      : if (is_present (s1())) {
+         : print "No way!";
+         : done;
+      }
+   }
+   : match "insert -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "insert *" {
+      : if (is_carried (s1())) {
+         : print "There's no container.";
+         : done;
+      }
+   }
+   : match "jump -" {
+      : print "Whee. That was fun.";
+      : done;
+   }
+   : match "knock -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "knock *" {
+      : if (is_present (s1())) {
+         : print "Knock, knock.";
+         : done;
+      }
+   }
+   : match "listen _" {
+      : if (is_present "sleeping_gorilla") {
+         : print "You can hear the gorilla snoring.";
+         : done;
+      }
+      : if (is_present "angry_gorilla") {
+         : print "You can hear the gorilla growling. He seems to be angry about something. You wonder what that could be.";
+         : done;
+      }
+      : if (is_at "room06") {
+         : print "You can hear the TV in the background.";
+         : done;
+      }
+      : print "You don't hear anything out of the ordinary.";
+      : done;
+   }
+   : match "move -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "move *" {
+      : if (is_present (s1())) {
+         : print {("The " + original_noun1() + " won't budge.")}
+         : done;
+      }
+   }
+   : match "open -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "open *" {
+      : if (is_present (s1())) {
+         : print {("You can't " + original_verb() + " the " + original_noun1() + ".")}
+         : done;
+      }
+   }
+   : match "pat -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "pat *" {
+      : if (is_present (s1())) {
+         : print "There's no response.";
+         : done;
+      }
+   }
+   : match "pull -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "pull *" {
+      : if (is_present (s1())) {
+         : print {("The " + original_noun1() + " won't budge.")}
+         : done;
+      }
+   }
+   : match "read -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "read *" {
+      : if (is_present (s1())) {
+         : print "You're a chimpanzee, remember. You never learned how to read.";
+         : done;
+      }
+   }
+   : match "remove -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   // : match "remove *" uses system remove
+   : match "repair -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "repair *" {
+      : if (is_present (s1())) {
+         : print {("The " + original_noun1() + " is not broken.")}
+         : done;
+      }
+   }
+   : match "ride -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "ride *" {
+      : if (is_present (s1())) {
+         : print {("You can't " + original_verb() + " the " + original_noun1() + ".")}
+         : done;
+      }
+   }
+   : match "say _" {
+      : print "You're a chimpanzee, you know.";
+      : done;
+   }
+   : match "scream -" {
+      : print "\"Screach!\"";
+      : done;
+   }
+   : match "search -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "search *" {
+      : if (is_present (s1())) {
+         : print "You don't find anything.";
+         : done;
+      }
+   }
+   : match "show -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "show *" {
+      : if (is_carried(s1())) {
+         : print "Nobody seems interested.";
+         : done;
+      }
+   }
+   : match "sing _" {
+      : print "\"Hoo, hoo, hoo.\"";
+      : done;
+   }
+   : match "sit _;sit down" {
+      : print "This is no time to rest. You need to get back to your enclosure.";
+      : done;
+   }
+   : match "sleep _" {
+      : print "This is not time to sleep. You need to get back to your enclosure.";
+      : done;
+   }
+   : match "smell -" {
+      : print "Sniff, sniff.";
+      : done;
+   }
+   : match "smell *" {
+      : if (is_present (s1())) {
+         : print "Smells normal.";
+         : done;
+      }
+   }
+   : match "talk -" {
+      : print "\"Hoo, hoo.\"";
+      : done;
+   }
+   : match "talk *" {
+      : if (is_present (s1())) {
+         : print "\"Hoo, hoo.\" There's no response.";
+         : done;
+      }
+   }
+   : match "think _" {
+      : print "You think that if you and some of your chimpanzee mates could sit down at a bank of typewriters and hammer away, you could write the complete works of Shakespeare.";
+      : done;
+   }
+   : match "tie _" {
+      : if (noun1_is "") {
+         : print {("You'll have to tell me what to " + original_verb() + ".")}
+         : done;
+      }
+      : if (!is_carried (s1())) {
+         : print "You aren't carrying that.";
+         : done;
+      }
+      // : if (preposition_is "" && noun2_is "") {
+      //    : print "You can't tie that to anything here.";
+      //    : done;
+      // }
+      : if (noun2_is "") {
+         : print {("You need to tell me what to " + original_verb() + " the " + original_noun1() + " to.")}
+         : done;
+      }
+      : if (preposition_is "to" && !is_present (s2())) {
+         : print {("You can't " + original_verb() + " the " + original_noun1() + " to something that's not here.")}
+         : done;
+      }
+      // Specific cases go here
+      : print {("You can't " + original_verb() + " the " + original_noun1() + " to the " + original_noun2() + ".")}
+      : done;
+   }
+   : match "touch -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "touch *" {
+      : if (is_present (s1())) {
+         : print {("The " + original_noun1() + " feels normal.")};
+         : done;
+      }
+   }
+   : match "untie _" {
+      : if (noun1_is "") {
+         : print {("You'll have to tell me what to " + original_verb() + ".")}
+         : done;
+      }
+      : if (!is_present (s1())) {
+         : print "You can't see that here.";
+         : done;
+      }
+      : if (preposition_is "" && noun2_is "") {
+         // Specific cases go here
+            : print {("You can't " + original_verb() + " that because it's not attached to anything.")}
+            : done;
+      }
+      : if (preposition_is "from" && noun2_is "") {
+         : print {("You need to tell me what to " + original_verb() + " the " + original_noun1() + " from.")}
+         : done;
+      }
+      : if (preposition_is "from" && !is_present (s2())) {
+         : print {("You can't " + original_verb() + " the " + original_noun1() + " from something that's not here.")}
+         : done;
+      }
+      // Specific cases go here
+      : print {("You can't " + original_verb() + " the " + original_noun1() + " to the " + original_noun2() + ".")}
+      : done;
+   }
+   : match "use -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   : match "use *" {
+      : if (is_present (s1())) {
+         : print "'Use' is a pretty vague word. Please be more specific.";
+         : done;
+      }
+   }
+   : match "wait -" {
+      : print "Time passes...";
+      : done;
+   }
+   : match "wake -" {
+      : print {("You'll have to tell me who to " + original_verb() + ".")}
+      : done;
+   }
+   : match "wake *" {
+      : if (is_present (s1())) {
+         : print {("The " + original_noun1() + " is not asleep.")}
+         : done;
+      }
+   }
+   : match "wear -" {
+      : print {("You'll have to tell me what to " + original_verb() + ".")}
+      : done;
+   }
+   // : match "wear *" uses system wear
+   : match "xyzzy -" {
+      : print "Chimpanzees don't go around using magic words.";
+      : done;
+   }
+
+   // Meta commands
+   : match "about -" {
+      : decrement "turns";
+      : gosub "version";
+      : print "Written for The Next Adventure Jam, 6 June to 5 July 2020. Rules defined at <itch.io/jam/next-adventure-jam<13>>[https://itch.io/jam/next-adventure-jam].\n^n^Adventuron written by <Chris Ainsley<11>>.\nGame concept by <Pat Handy<11>>.\nDesign, coding and graphics by <Garry Francis<11>>.\nPublic domain Topic font by <Rutherford Craze<11>>.^m^";
+      : done;
+   }
+   : match "inventory -" {
+      : decrement "turns";
+      : inventory;
+   }
+   : match "restore -" {
+      : decrement "turns";
+      : load;
+   }
+   : match "look -" {
+      : decrement "turns";
+      : redescribe;
+   }
+   : match "save -" {
+      : decrement "turns";
+      : save;
+   }
+   : match "score -" {
+      : decrement "turns";
+      : print "There's no score in this game. Your objective is to find your way back to the chimpanzee enclosure.";
+      : done;
+   }
+   : match "turns -" {
+      : decrement "turns";
+      : print {("You have taken " + turns + " turns.")}
+      : done;
+   }
+   : match "version -" {
+      : decrement "turns";
+      : gosub subroutine = "version";
+      : done;
+   }
+}
+
+######################################
+#  On Pre Describe
+######################################
+on_pre_describe {
+   // Floating objects in alphabetical order
+   : if (is_just_entered()) {
+      : if (is_at "room01") {
+         : create "glass_window";
+         : create "gorilla_enclosure";
+         : create "tall_walls";
+      }
+      : else_if (is_at "room02") {
+         : create "gorilla_enclosure";
+         : create "tall_walls_02";
+      }
+     : else_if (is_at "room03") {
+         : create "orangutan_enclosure";
+         : create "tall_walls_02";
+      }
+      : else_if (is_at "room04") {
+         : create "orangutan_enclosure";
+         : create "glass_window";
+         : create "tall_walls";
+      }
+     : else_if (is_at "room05") {
+         : create "orangutan_enclosure";
+         : create "tall_walls_02";
+      }
+      : else_if (is_at "room07") {
+         : create "door";
+      }
+      : else_if (is_at "room08") {
+         : create "door";
+     }
+   }
+}
+
+######################################
+#  On Describe
+######################################
+on_describe {
+   : if (is_refresh) {
+      : set_false "is_refresh";
+      : print {(message)}
+   }
+   : if (is_just_entered() && is_at "room08") {
+      : print "\"G'day, Bob\", says the security guard.";
+   }
+}
+
+######################################
+#  On Tick
+######################################
+on_tick {
+   : increment "turns";
+   : if (is_just_entered() && turns == 1) {
+      : gosub "version";
+      : print "Type ABOUT for credits.";
+   }
+   : if (is_on_swing && !is_tyre_swinging) {
+      : print "You're on the tyre swing.";
+   }
+   : if (is_on_swing && is_tyre_swinging) {
+      : print "You're swinging on the tyre swing.";
+   }
+}
+
+######################################
+#  Vocabulary
+######################################
+vocabulary {
+   : verb / aliases = [about, credits, info]
+   : verb / aliases = [abracadabra, plover, plugh, sesame, xyzzy, yoho]
+   : verb / aliases = [arouse, awake, rouse, wake]
+   : verb / aliases = [ask, answer, question, tell]
+   : verb / aliases = [attach, connect, fasten, tie]
+   : verb / aliases = [attack, destroy, fight, kill, murder, punch, thump]
+   : verb / aliases = [babble, chat, communicate, converse, gab, gossip, speak, talk]
+   : verb / aliases = [bash, break, bust, crack, crash, smash, snap, strike]
+   : verb / aliases = [browse, read, scan]
+   : verb / aliases = [build, construct, make, sew]
+   : verb / aliases = [caress, embrace, hug, kiss]
+   : verb / aliases = [carry, get, hold, purloin, steal, take]
+   : verb / aliases = [check, describe, examine, inspect, watch, x]
+   : verb / aliases = [chuck, throw, toss]
+   : verb / aliases = [close, shut]
+   : verb / aliases = [consume, eat, peel, taste]
+   : verb / aliases = [cut, slice]
+   : verb / aliases = [detach, disconnect, unfasten, untie]
+   : verb / aliases = [discard, drop]
+   : verb / aliases = [display, present, show]
+   : verb / aliases = [disrobe, doff, remove, shed]
+   : verb / aliases = [dive, hop, jump, leap, skip]
+   : verb / aliases = [don, wear]
+   : verb / aliases = [drink, sip, swallow]
+   : verb / aliases = [feel, fondle, grope, touch]
+   : verb / aliases = [fix, mend, repair]
+   : verb / aliases = [force, heave, move, push, press, shift, shove]
+   : verb / aliases = [give, offer]
+   : verb / aliases = [go, run, walk]
+   : verb / aliases = [groom, pat, pet, stroke]
+   : verb / aliases = [hear, listen]
+   : verb / aliases = [hit, poke, slap, smack, spank, whack]
+   : verb / aliases = [holler, scream, shout, yell]
+   : verb / aliases = [insert, place, put, replace]
+   : verb / aliases = [knock, rap, tap]
+   : verb / aliases = [lie, sit]
+   : verb / aliases = [load, restore]
+   : verb / aliases = [nap, sleep, snooze]
+   : verb / aliases = [plant, sow]
+   : verb / aliases = [pull, drag]
+   : verb / aliases = [quit, q]
+   : verb / aliases = [ride, mount]
+   : verb / aliases = [say, utter]
+   : verb / aliases = [smell, sniff]
+   : verb / aliases = [swim]
+   : verb / aliases = [wait, z]
+
+   : preposition / aliases = [about]
+   : preposition / aliases = [from]
+   : preposition / aliases = [in, into, inside]
+   : preposition / aliases = [off]
+   : preposition / aliases = [on, onto]
+   : preposition / aliases = [with]
+
+   : adjective / aliases = [big, giant, huge, large]
+
+   : noun / aliases = [akubra, hat]
+   : noun / aliases = [arse, ass, backside, bottom, bum, butt, buttocks, derriere, derrière, rear, rump]
+   : noun / aliases = [bamboo, stick]
+   : noun / aliases = [glass, window]
+   : noun / aliases = [glasses, sunglasses]
+   : noun / aliases = [grate, grating, vent]
+   : noun / aliases = [keeper, zookeeper]
+   : noun / aliases = [roof, rooftop]
+   : noun / aliases = [room, storage]
+   : noun / aliases = [rope, swing, tire, tyre]
+   : noun / aliases = [stair, stairs, step, steps]
+   : noun / aliases = [television, tv, set]
+   : noun / aliases = [tree, trunk]
+   : noun / aliases = [wall, walls]
+}
+
+######################################
+#  Subroutines
+######################################
+subroutines {
+   refresh : subroutine {
+      : set_true "is_refresh";
+      : redescribe;
+   }
+   version : subroutine {
+      : print "^n^Charlie the Chimp version 1.0.0\nCopyright © 2020 Garry Francis\nCompiled with Adventuron version 1.0.0 Beta 42d^m^";
+      : return;
+   }
+}
+
+######################################
+#  Themes
+######################################
+themes {
+   my_theme : theme {
+      colors {
+         exit_list_header_pen = 8
+         inventory_header_pen = 8
+         status_bar_paper = #300
+         status_bar_pen = 15
+         yousee_header_pen = 8
+         prompt_pen = 15
+         textbox_pen = 14
+      }
+      status_bar {
+         : header_text;
+      }
+      lister_exits {
+         exit_list_capitalization = lower
+         experimental_enable_direction_arrows = false
+         is_show_blocked_exits = false
+      }
+      lister_inventory {
+         item_capitalization = original
+         list_type = single_line
+      }
+      lister_objects {
+         item_capitalization = original
+         list_type = single_line
+      }
+      screen {
+         // padding_horz = 4
+         paragraph_spacing_multiplier = 0.5
+         status_bar_padding_bottom = 2
+         status_bar_padding_horz = 4
+         status_bar_padding_top = 2
+      }
+      theme_settings {
+         capitalization = original
+         font = userfont_topic
+         header_capitalization = original
+         layout = SB G LOCK D X O
+         layout_mobile = SB G D X O
+         shader = none
+         wingame_jingle = on
+      }
+   }
+}
+
+######################################
+#  Assets
+######################################
+assets {
+   graphics {
+      title_screen : base64_png "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";
+      room01  : base64_png "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";
+      room01a : base64_png "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";
+      room01b : base64_png "iVBORw0KGgoAAAANSUhEUgAAAQAAAABQCAMAAADBVVsXAAAAA3NCSVQICAjb4U/gAAAANlBMVEXf28jMzMzhwZjPvqWeumtqmECBgoaleFd1dDhzbGtbW11LS00/Pz89PkAtLjBVHwAAMwAAAACroiqkAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAJXRFWHRTb2Z0d2FyZQBNYWNyb21lZGlhIEZpcmV3b3JrcyBNWCAyMDA0h3aszwAAABZ0RVh0Q3JlYXRpb24gVGltZQAwNi8yNi8yMBCQvGQAAAh8SURBVHic7ZuLdrI6EIV7sDS2WnG//8v+ZG6ZhIAREV2rZ1Yv3ojsL3smIcaPj/bAYT7QYxiGEAJ6HzjEhznSrfi6gC7GUpvtAZQ3muMO/UsAomxgSqAOIGwLQFQjxt0HbwMArNoRkAcOEQA8AIj+zQCY/LHJFYdv5ABGkDyA6InxMVQAhI0B8NuHdfq3A0B6pRBQp8Q/qAAIBgBbAKB3IfnrmtoIwNjX5oFBOkOsScphBAjAQAbA4xagvA/r5W9WAzjj1QODs2MJIID0PwIAKdhLa4qfxlYAYMVfCcirpwBsFKSfu08dlkSi/TEPbQIgnkQa/TAoAopsAEgAulUAOpUvjT+knWIbBxy4CvaaCWm0D0MBQIaBbg5AN6tLPF8ofxTCdgCgWcCDfxYegOmvAIiN0DO5yizff2Los497YDsAh4ON/XzKEwB5/xMBD0DEd+kFWalj/T8ab5cCBwHg5+WlEXQU7AxAGgWS+qlsySWvnxAcHkGAJwBgAv5+jiCqKwDYgBbvasngF3sIxA7IABCC1UmATz5yYwDoixe5QYC6MKQKoLqVRixwYhMzj44kbPdCvyBYqX8MbA6g0iFADUAmnZzPM0SQaD7Oh7Q1AXA3Asu4ZwGovacSCA5AKnFsfZGPYUFQTf+dCPCJpH9vAMEABFR6X6aMSw1Z8a/Ugkb9rPoVAOABpDrYBXmYX3RzqvHFMUXQcHJQ2cArAAQPIBb4qF4dwYhuq8Avx4jg3kwQ0VG13NoRQBTnAKSLWP6h55ftbwD+o58KgBFBi/79AehA6AjYRIcASO+36HcOEAJoJIDrKPgqol8OICJQA/CzLfanxr4skOvHMgFcr1fSTLE3AOniBICHBL9Q0Na2008EXP+flgmMAMgAeWBfAAMSAJrwrNCPL8wAWCYQHUAIxp+exF/3BqBXQpwBJF/1t47jmQFGAFkBUAIziwnXqyTBZ99f+94ssA8Andm761p3gdg+j8kB5APBSQjUTTAC6MkDpH78w2Z4HQC76I3lsHVdTI9g/b8zAGoExADjL6kfGRCCXQAcwAWgAOCjGYD2fQ3AjwGYpgHrjyYg9RRcE/EWAO6wQPL/7zyAqQkigb6nPxJSEq67AHCfChWzAVnyaF8bNv/HKIqgA6AXTXb1axYwBtcxF8ac2BNAKAAg3WwioJ+CxrgFQEcI++j0mhBkJtgJAH8ojFy1y4imT4h0JfhyuUwBnAoANkbCySfNJp/u7QcgOADFrdA1WWCUgSUA5SWyVgbrfamDzgAvBaD1j//cIBBtH88X7QCUgHe/0y8EdgVQZr6Yn//cupwXFWgHoE/kDug9gX4nAEgbQ7gSGgVaD+b1kVYCBqA2E64BKDygvb+nAxyAlAYJAMgCjQSSBdoAlBa4pgrYvwCAT4DkgMAUGglEAJdyIjRXAkoAWv01dgRgVWCGwA0AyKvApZgKF/pP6VLxVFogQ7AngKGWA0EB3CCQNAiAC/IaOOuHCgAHYVcAQw1AcADmCTgJBmA+A04NAPZzgLsaSp+OlQBuEMgUoAFAtlb0DgDsgsgT4N1tgFlgPgm8BKmC87OA6b23AKAEJPNTJtAHw1YLqy2gAmBJ/9sCCLo+7j4U9GWwZoFcPRFYBHAqr4veAEBa/QslAP6MDKkWzK3mOAN8Yx7A6XQDgCwUvABAlA8dDgUArP7ZvxsARvnfVQCnLLJn4aVHJbEJwbAfAP54UCcE0xRoJBD1f0wBlPr9ZoJ4QRzVjgdqfEtg1xRwe4CCbojyACQJymVyTPRHAMU0sNR/8DWBxH87/UTgvDMA+D1QehVk9cATCMVmSeQAxrPHNAOQ63cE4gOl/kjgTAT2AsBS/XSAxKK0QJeQzAD4qAEYR0ZDoMuA3iDfNQcQgR0AWOWX/rcJUaoCulEo7Rgif1gLyPSXJSCK5qlRFj9TAoaBbhCBuwCsi1D6f1IHodlPCOAQWPgSUA4CCoBDTZ0DoN4uIxK4R/9xRfDuH1Jm6jGUBAJPh93lcbBMGCO2A9U/GQXJ9VMAH3kZPEuUBJ6qn4qcdr/74gxk56eNBFwNYLL9kmG8K43hGMv5+bwCwNEjOLt4nn6Y7eW/swD1+eCmg0EnRRMCPFHMmo1xyYo8l4VFAOOR5zzSvOgZ+lPV5wkwPADSBR4JLAl4WUwRQL8KZMNi2X7SnwFI050SALFz2rmhJwHw8kPaEKGzAH5wCJIFVgDNBVIAxQSQipi9g9OvdUEA2DSvAJAM5Np5nv7J7Mftf2ZdMiHU7YLQJWIiELj0WS50WSZ4A8Bm9oDO+TIAJwdgEs/Qz6VP5PutIIPuleCMj1cHSgA2BHTW79KYo6DnkVfA72zMLwmcFvW3AWjVrwN/1vtpu3haF9K8kK9WpRmR976zqjWMQj9P9Em3AXCpri8oK8idAJr7P/uWjFR2P/SnnQKaAwOk29MmUvsyQc5AOUwB0H37KtGP1TsN2k/wCIA1+s0G0QDuGwMlAQxa/6FbRzUTOvVB5Y0mAGQjOUHgl2T7qR4C0J7/fvobBsC6PSOANBLY3jm4GRHfWESQz/GOXBNxLPTr7zKBDfU7ENllj0+MzCK2VTCkOaGN/cGNCeU5EGPJeNEmHJDpJ/tzFqwGcL9+lJ3tlwThng3pAoHGQ7eD2F0mk58KE5iwOW2gDaX4Sh7YD4At/6SKp1990pNT2VLq+W5nnU+/R1syl0P8ifgER10bI/jSGri6BqxJAFZ8RNJeOT1FMIhAwXFMA6BOl2pv0VLgyByxnSX5twCsuwKWsWpYGn9TXthBzModNEuA7S0mnz9HpOowH9vrz99+9tmhIFBvYoah5fhMAtwRT9N/K0oL3Hu4WebBeJV+P2t47vvciJfpf5f46/pnAfwV/f8D+Ov6ZwD8Hf11AH9I//EfUNEgpsLblIkAAAAASUVORK5CYII=";
+      room02  : base64_png "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";
+      room03  : base64_png "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";
+      room03a : base64_png "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";
+      room04  : base64_png "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";
+      room04a : base64_png "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";
+      room05  : base64_png "iVBORw0KGgoAAAANSUhEUgAAAQAAAABQCAMAAADBVVsXAAAAA3NCSVQICAjb4U/gAAAANlBMVEX////K5s260M3GwsHPvaWpwLrDtKGru3ySp6iikoNqfIZ4a1tqa2ZDT1Q/Pj4aGhoZFxgAAADfB1eSAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAJXRFWHRTb2Z0d2FyZQBNYWNyb21lZGlhIEZpcmV3b3JrcyBNWCAyMDA0h3aszwAAABZ0RVh0Q3JlYXRpb24gVGltZQAwNi8zMC8yMAibyggAAAR3SURBVHic7doNc9MwDAZgd0DTDLbh//9nWdJ82PqyZMvODtDd7miW2HqfqO1YF27/eIWrG7i6/gMc/5qWurCTi+oAmLa6JQcu6UioHh0hgCl/7L9jbaE75FM7wJRW9th5w9qaXDvaIt4OgEkqhw2t/eFtXRta1thW0gBIO6bf87PCO7veknShgFc3EOAezwcuDcKXJBeAbKWgCL+dGrdCK3EPjE3RHU7EofNgs4AWYAn+stVBkHdzSx7k3yC2J1uyApiVqQ0KAPGol6RWAr5H6R0LXZIcJQHI/OtxfhMngCX261GAgO0HHGV3Th5BAN3a1CZKjfRqHiAJvxGIAsXmUDQqFhHfsAe1pZh+4gEiyl8nkN+gPgXX12ZfiwEg4lcLTOzmToXyGfLbAGoFehcKeKPea+hraQAm/5cVQC8exLOBuTBEqrj8uQB56ZAywcjPwPCDKAkgpgDUxSPKQFB6+aEAhPznCDxvxfDoR49qgUKRTwEJYBEYOe2gTgEngvBAJed/TdvBF3eudOZ8BJoAhud/xEc2BA6FAQr5rwb4/EqG4HtzmQEuzb8CZALNBPhFUD8AV9QDCDQPQbifNX/WXT8Ad1AzPHCPvxoL7XHfBLIhaKqwJ1/CrztoAWB8Mn9TbxTAJpAPwc+GCkfyfYO6AcDx1/zfWkov0EAQ0PpVA9AjPwNACTQMgQ2AGQBi/B3yFwVchqAWoHD7Qf6QFDhYAJAEXIYAAMyzBLCnf3uL6SWm/BYAbgQYgSoC8DYoT8Cafa2zLSq+IX8RwCBQNQQHgOZtcI+fACjytxQ3AqdA6xCELL0VgBx/x/z8CBwCrUMQsvRGADL++vOfF0CFgJEgwJuoB6Bvv29+4UnACRiHgH4bfCcKAtDxvfMLI8ALWAgwwBIW/FC+HIEAg/IrBeqHAADg8Gv6+AEBhuWXAE6B+iFIAYj08ZkeAwzLXymgHoIdgBj8583/MAB0yS8CtAsE7tZn6XUAffLrBaqeBuF584lK06sAeuVfATQCVUOwAMQ1Y/Z1PPX1AGv+TiUBiAJlAjeA5t//2X8/qBAoD4EXQPf8AkAmYB0CJ4Bes5+VSsA6BF4Av/uXAFAQkAj+jgkoCEhD4PUaMIMmnIv70ZsRMAyBE8AMe/AG4P7zRQJYhiDMswPATPQwGKAsQBPUTQD9sUjf53+zAD0EVQDlj4XuV5wBBHRDUANgzu8SzyygGwI7gOJjwS7pNKcoBCCBGYB8/R+SzkcADoEVQPFnEb3Cqc6BAsUhMALU5Hc7p0agOAQ2gKr8YwF0ArEC4Plu3Ktt1Ul+AucQ6AH6du24FBaQhkAL0Dm/8qxKAWkIdABUfN+efZ2UAlELMCC/83I6gWUIFADvLfkvAlALxDIAGd89v/uCWIAmKAHQt98/l78o/u0EKVAAoOPru7hQSikgAjC3v0f+DgA6AQmAiX8xQJsAIpAARvbaZ1Hit5RQgAXgxr9Tqk6nlgXYj8cHd9pr2aJA6NjolziXEog5APP3fmP77Lcw9WlFIvAHwdVR5U4iuw8AAAAASUVORK5CYII=";
+      room05a : base64_png "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";
+      room06  : base64_png "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";
+      room07  : base64_png "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";
+      room08  : base64_png "iVBORw0KGgoAAAANSUhEUgAAAQAAAABQCAMAAADBVVsXAAAAA3NCSVQICAjb4U/gAAAATlBMVEX/////8cP+77nG+vj96qb16Nj86Jz21U/syaP00Dyh2snzzCmtq5benX7BoXuZmZmAe2mBZU1gZ21/YCk4O0A3Oj43OT00NTYzMzMAAAAmAOdgAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAJXRFWHRTb2Z0d2FyZQBNYWNyb21lZGlhIEZpcmV3b3JrcyBNWCAyMDA0h3aszwAAABZ0RVh0Q3JlYXRpb24gVGltZQAwNy8wMi8yMENFc+cAAAShSURBVHic7ZmLVtswDEAbAhsjHawr5xD//4+usRNbtiVbbvxKmc4hpUSE3iv5kXB6Swnx8SEy5gZTkJNiyh8nLg8XKiXXTRnH8O9rAbMM9Y1+v30jX9TXBH7ekQDN6aSM+wTM1usE31cQsH34kaIz4GSKxR8ZAhv4ZFXcfM2mC0BeOQHjSjUGBJgU/HLjHgFb5afJ7oTJvCYIcD5KXMC4go8BAT6/neL+UZ6A2QiwO8EXwhcwpgrA+KkBDi8NU7SfBAGzX2n0vc7jCRhTBYzIAKAG+EgLcE6zBEz2uCdWAZPMERDgxwXg/PgAJyd6rwGa7QNC/KgAi58SgPKDlNgEAQUIFYUEBPmxD0Xx4wOcmOew84QAIT5VZHLgCAjzo2s7wY/2t3NpIMA/jwrQ+KuDr68Fwl0EJjgdWlvEmIAIP7q2E/x+f795l95S/AmAEGDhKwU2rd7yWfM/2BKGBcT4sbXdzO50eZEFwBGAnMc7wDXwKSZqufe3hzEBkB83gQkg+N3yYle8YyPkGhDC6fcZ8qcJcPgZAiz+cHmRAYDOk1EBTqAbQc2fJMDljwsITAAml7uokAIdAX9hCG/L79wfJswBHH6vZwP8ay53UaE7CP7IC/8GcLIE8FcBFr/bsyF+lctdVGIThM8/DMP1et2/FTil8DsloydAICDA7y8UYQFyCAwmrtchlwAmv12yMH/SIzGyg3wBsvrqeB1yCeDyWyULLACpAugh5As4zfNNgDzmFcDhh584xp8mgPf7i4BZCpDH4UeG24FNAIsfLG1mdU99esRNIQX8kQJuxwz1v/NeILpjLCfgp1oA1mNuATF+zuaGR8dIoQSAZSC3gCh/B/8Z+lVQQJy/AwG3jcDvJQoIYPB3IeBpLf8T5Pc3yWC3zBPA4e9CgHiW/M8WnZip4Apg8bcXsDwTkgvAIM7miVAGATz+5gKWxyHns6z9+RbLO5FFAJO/lYBtOJ9VLF1w3iKLAC5/dQFrvKjQ1MLwrwb2CWDz1xNgkzv8iwDTEK4A9aAsRQCfv5YAh9wIEHYHCG0ACrhdNF1APqi9ArzCv4AZYCX+zC4gI9Q+ARB+A7+oAA2QWUBClBUAa2/AL66AZS2EBh5IAKj+xYv/AigBZ/GAAl6ENwaEmQK+gwA4CwpbgDsJPowAf+vjmYAB+Y8vYCF6Fe/v75SDmBVaQOTpQAcCJPwSiwDlgK8BsWHuIZDtdG8CNDwQoDWkOdAqFgHk2a4EQHhPgG6FtH5YW34m9bjRSoBw6REBuIuwk4gx72++thCAwUcE8Jwwor0AAj5dwF3RWABV+m8hIAIvBZQ30EpAHH5TUNhBCwGM0tdrg9oCEuF1G4hSrVBVwD3wyoC6+yshoZqA++m1gE1C1n6oImAXvC3ggqjY5aS8gL3wlACek8Y7wd2lTxNwT5QTkAv+mAIywh9PQM7SH05AAfgDCSgDfxABhUp/DAFl4XsXUBy+ZwF16DsVUA2+RwFV4bsTUBteCihnIE1A9dLrKKaAL6AdvIpCCpgCGsOrkBuOBgJal94OkVlDREBf8CbyaQgJ6BTehPd4K6OAXksfjizPBP8B3x28MRsvfmYAAAAASUVORK5CYII=";
+   }
+   fonts {
+      userfont_topic : base64_ttf horz_pixels = "8" vert_pixels = "8" font_scale_multiplier = "2.0" experimental_line_height_ratio = "1" snap_vert = "true" "AAEAAAAOAIAAAwBgRkZUTWuWRxMAAC0EAAAAHEdERUYAmwAkAAAs3AAAAChPUy8yhflxvQAAAWgAAABWY21hcNRRgxYAAANwAAABWmN2dCAAIgKIAAAEzAAAAARnYXNw//8AAQAALNQAAAAIZ2x5ZnToQEkAAAWsAAAkeGhlYWQYchjhAAAA7AAAADZoaGVhBl4DbQAAASQAAAAkaG10eLPLACIAAAHAAAABsGxvY2Hp5+EKAAAE0AAAANptYXhwALcAnwAAAUgAAAAgbmFtZQwShsEAACokAAABnnBvc3TXQVG1AAArxAAAAQ8AAQAAAAEAAJUKXvVfDzz1AB8EAAAAAADbH2ryAAAAANsfavIAAP8AAwADAAAAAAgAAgAAAAAAAAABAAADAP8AAFwEAAAAAAADAAABAAAAAAAAAAAAAAAAAAAAbAABAAAAbABuAAkAAAAAAAIAAAABAAEAAABAAC4AAAAAAAEBmwH0AAUAAAKZAswAAACPApkCzAAAAesAMwEJAAACAAYDAAAAAAAAAAAAAwABAAIAAAAAAAAAADJ0dGYAQAAgMAADAP8AAFwDAAEAAAAAAQAAAAAAAAF2ACIAAAAAAVUAAAFAAAAAwAAAAcAAAAJAAAACAAAAA0AAAAIAAAABAAAAAUAAAAFAAAABwAAAAcAAAAEAAAABwAAAAMAAAAHAAAABwAAAAUAAAAGAAAABgAAAAcAAAAGAAAABgAAAAYAAAAGAAAABgAAAAMAAAAEAAAABwAAAAcAAAAHAAAABwAAAAsAAAAHAAAABwAAAAcAAAAHAAAABgAAAAYAAAAHAAAABwAAAAUAAAAFAAAABwAAAAUAAAAKAAAACQAAAAcAAAAHAAAACAAAAAcAAAAHAAAABwAAAAcAAAAHAAAACgAAAAcAAAAHAAAABwAAAAQAAAAHAAAABAAAAAcAAAAHAAAABQAAAAcAAAAHAAAABwAAAAcAAAAHAAAABwAAAAcAAAAHAAAAAwAAAAQAAAAHAAAABAAAAAsAAAAHAAAABwAAAAcAAAAHAAAABwAAAAcAAAAHAAAABwAAAAcAAAAKAAAABwAAAAcAAAAHAAAABwAAAAMAAAAHAAAACwAAAAUAAAADAAAACAAAAAgAAAAKAAAABwAAAAMAAAAHAAAACAAAABAAAAAAAAAMAAAADAAAAHAABAAAAAABUAAMAAQAAABwABAA4AAAACgAIAAIAAgB+AKcgrDAA//8AAAAgAKAgrDAA////4//C377QawABAAAAAAAAAAAAAAAAAQYAAAEAAAAAAAAAAQIAAAACAAAAAAAAAAAAAAAAAAAAAQAAAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGRlaQAAAAAAAAAAAAAAAAAAAGcAAAAAAAAAAAAAAABjAAAAAAAAAABiAAAAAAAAAAAAAAAAAAAAAGoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiAogAAAAqACoAKgAqAEYAbgCsAPwBZAGgAbYB5AISAkACYAJ2AooCmgLGAvwDGgNQA4ADqAPYBAoEMgRoBJgEsgTSBQAFIAVOBXwF3gYOBkQGcAacBsIG4gcUB0AHYAeAB7IHzAgECDgIZgiQCNIJCAlCCWYJkAm6CfIKKApQCoAKoArOCu4LEgsmCz4LcAucC8YL8gwkDFIMigyyDNAM9A0kDT4NeA2gDcoN+A4mDkgOgA6qDtAO9g8qD1wPkA+6D+wQCBA6EGQQZBCCEMAQ+hFUEY4RsBIAEjwSPAAAAAIAIgAAATICqgADAAcALrEBAC88sgcEAO0ysQYF3DyyAwIA7TIAsQMALzyyBQQA7TKyBwYB/DyyAQIA7TIzESERJzMRIyIBEO7MzAKq/VYiAmYAAAIAAAAAAIACQAAPABcAAD0GOwEdBCMdASM9ATsBHQFAQEBAQEDAQEBAQEBAQEBAQEBAwEBAQEAABAAAAUABgAJAAAMABwARABsAABM1MxUhNTMVNz0COwEdASMVIT0COwEdASMVwED/AEDAQEBA/wBAQEABQEBAQEBAQEBAQEBAQEBAQEBAAAACAAAAAAIAAgAAKwAzAAAhPQErAR0BIz0BIzU7AT0BIzU7AT0BMx0BOwE9ATMdATMVKwEdATMVKwEdASczPQErAR0BAQBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQMBAQEBAAAAABAAA/4ABwALAADMAOwA/AEcAABc9ASsBNTsBPQIrATUjPQIzNTsBPQEzHQE7ARUzFSM1KwEdAjsBFTMdAiMVKwEdATc9AiMdAisBNTM3PQIjHQLAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQMBAQIBAgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEDAQEBAQEBAQMBAQEBAQEAAAAUAAP/AAwADAAAlADkAQQBVAF0AABc9AjM9ATM9ATM9ATM9ATM9ATMdAiMdASMdASMdASMdASMdASUrATUjPQIzNTsCFTMdAiMVJz0CIx0CASsBNSM9AjM1OwIVMx0CIxUnPQIjHQLAQEBAQEBAQEBAQEABgEBAQEBAQEBAQEBA/oBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAFAQEBAQEBAQEBAQEBAQEBAQEAAAAABAAAAAAHAAkAAOQAAISsCNSM9BjM1OwMVMxUjFSsBNTM1KwEdAjMVIx0COwE9AzsBNTMdASMdAiMVAQBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAACAAABQADAAkAAAwANAAARNTMVPQM7AR0BIxVAQEBAAUBAQEBAQEBAQEAAAAMAAP+AAQADAAADACMAJwAAFzUzFScjNSM9ASM9BTM9ATM1Mx0BIx0HMxURNTMVwEBAQEBAQEBAQEBAgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAsBAQAAAAwAA/4ABAAMAAAMAIwAnAAAVNTMVPQIzPQcjPQEzFTMdATMdBSMdASMVAyM1M0BAQEBAQEBAQEBAgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAMAQAAAAAABAAAAgAGAAkAAJQAAJTUjHQErAT0BIxUjPQEzNSM9ATMVMz0BOwEdATM1Mx0BIxUzHQEBQEBAQEBAQEBAQEBAQEBAQMBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAEAAABAAYACAAAZAAA3Iz0CKwE1OwE9AjsBHQI7ARUrAR0CwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAACAAD/gADAAIAAAwANAAAVNTMVPQM7AR0BIxVAQEBAgEBAQEBAQEBAQAAAAAEAAAEAAYABQAANAAABMxUrBTU7AwFAQEBAQEBAQEBAQEABQEBAAAABAAAAAACAAIAABwAAMyM9ATsBHQFAQEBAQEBAQAAAAAEAAP/AAYADAAAlAAAVPQIzPQEzPQEzPQEzPQEzPQEzHQIjHQEjHQEjHQEjHQEjHQFAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAACAAAAAAGAAkAAHQAzAAAhKwI1Iz0GMzU7AxUzHQYjFSczPQMjNTM9ASsBHQIzFSMdAgEAQEBAQEBAQEBAQECAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAABAAAAAAEAAkAAGwAAMysCNTM9BCM1MzUzNTMdBzMVwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAABAAAAAAFAAkAALwAAISsDPQIzNTM1Mz0CIx0BKwE9ATM1OwIVMx0CIxUjFSMVIxU7ATU7AR0BAQBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAABAAAAAAFAAkAAKwAAMysBNSM1OwEVMz0CKwE1MzUzPQEjFSsBPQE7BB0CIx0BMx0CIxXAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAACAAAAAAGAAkAAHQAhAAAhIz0DKwI1MzUzNTM1MzUzHQMzFSMdAwM1IxUBAEBAQEBAQEBAQEBAgEBAQEBAQEBAQEBAQEBAQEBAQEABQEBAAAEAAAAAAUACQAApAAAzKwE1IzU7ARUzPQIrAj0CMzU7ATU7ARUjFSsBHQE7ARUzHQIjFcBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAIAAAAAAUACQAAlAC0AADMrATUjPQYzNTsCFTMdASsBPQEjHQI7ARUzHQIjFSc9AiMdAsBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAABAAAAAAFAAkAAIwAAMyM9AzM1MzUzPQEjFSsBPQE7BB0CIxUjFSMdA0BAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAMAAAAAAUACQAAfACcALwAAMysBNSM9AjM1Iz0CMzU7AhUzHQIjFTMdAiMVJz0CIx0CEz0CIx0CwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAEAQEBAQEBAAAIAAAAAAUACQAAjACsAADMrATUjNTsBFTM9AisBNSM9AjM1OwIVMx0GIxUDPQIjHQLAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAFAQEBAQEBAAAIAAAAAAIABwAAHAA8AADMjPQE7AR0BAyM9ATsBHQFAQEBAQEBAQEBAQEABQEBAQEAAAAADAAD/gADAAcAAAwANABUAABU1MxU9AzsBHQEjFREjPQE7AR0BQEBAQEBAQIBAQEBAQEBAQEABgEBAQEAAAAAAAQAAAAABgAJAACUAACEjNSM1IzUjNSM1MzUzNTM1MzU7ARUjFSMVIxUjFTMVMxUzFTMVAUBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAACAAAAwAGAAYAADQAbAAABMxUrBTU7AzczFSsFNTsDAUBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAEAQECAQEAAAQAAAAABgAJAACUAADMjNTM1MzUzNTM1IzUjNSM1IzU7ARUzFTMVMxUzFSMVIxUjFSMVQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAACAAAAAAGAAkAAHQAlAAA3PQEzNTM9ASsBFSsBNTM1OwMVMx0BIxUjFSMdASM9ATsBHQGAQEBAQEBAQEBAQEBAQEBAQEBAwEBAQEBAQEBAQEBAQEBAwEBAQEAAAAQAAAAAAoADAABRAGEAZwBtAAAlMxUrCDUjPQkzNTsHFTMdByMVKwE1OwE9BysGHQk7BScrATUjPQEzNTM1Mx0DIz0BIx0BEysBNTsBAkBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQECAQEBAQEBAQEBAQEBAQAEAQAAAAAACAAAAAAGAAkAAJQAvAAAhIz0DKwEdAysBPQczNTsDFTMdBwMzPQIrAR0CAUBAQEBAQEBAQEBAQMBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAFAQEBAQEBAAAADAAAAAAGAAkAAHwApADMAACErAz0IOwQVMx0CIxUzHQIjFSczPQIrAR0CEzM9AisBHQIBAEBAQEBAQEBAQEBAQECAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEABAEBAQEBAQAABAAAAAAGAAkAAKQAAISsCNSM9BjM1OwMVMxUrATUrAR0GOwE1OwEVIxUBAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAAAAgAAAAABgAJAAB0ALwAAISsDPQg7BBUzHQYjFSczPQYrAR0GAQBAQEBAQEBAQEBAQIBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAEAAAAAAUACQAAlAAAlMxUrBD0IOwQVKwIdAjsBFSsBHQIzAQBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAABAAAAAAFAAkAAHwAAMyM9CDsEFSsCHQI7ARUrAR0DQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAQAAAAABgAJAADEAACErAjUjPQYzNTsDFTMVKwE1KwEdBjsBPQIjNTsCHQMjFQEAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAEAAAAAAYACQAAtAAAhIz0DKwEdAysBPQg7AR0DOwE9AzsBHQgBQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAABAAAAAAEAAkAAHQAAMysCNTM9BiM1OwMVIx0GMxXAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAQAA/8ABAAJAAB0AABU9ATM9BiM1OwMVIx0GIxUjFUBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAEAAAAAAYACQAAxAAAhIz0CIzUjHQMrAT0IOwEdAzM1Mz0COwEdAiMVIxUzFTMdAgFAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAABAAAAAAEAAkAAGQAANzMVKwM9CDsBHQfAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAQAAAAACQAJAADkAAAE1IzUjHQUrAT0IOwEVMxUzFTM1MzUzNTsBHQgrAT0FIxUjFQEAQEBAQEBAQEBAQEBAQEBAQEABAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAEAAAAAAgACQAA1AAAhIz0CIzUjNSM1Ix0FKwE9CDsBFTMVMxUzFTM9AzsBHQgBwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAAAAgAAAAABgAJAAB0ALwAAISsCNSM9BjM1OwMVMx0GIxUnMz0GKwEdBgEAQEBAQEBAQEBAQECAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAACAAAAAAGAAkAAHQAnAAAzIz0IOwQVMx0CIxUrAh0DEzM9AisBHQJAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAUBAQEBAQEAAAAAFAAD/gAHAAkAAAwAJAA0ALQA/AAAXNTMVNzMVKwE1MzUzFSsCNSM1Iz0GMzU7AxUzHQYjFSMnMz0GKwEdBkBAwEBAQIBAwEBAQEBAQEBAQEBAQEBAQECAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAACAAAAAAGAAkAAJwAxAAAhIz0BIzUjHQIrAT0IOwQVMx0CIxUjFTMdATMVAzM9AisBHQIBQEBAQEBAQEBAQEBAQEBAQMBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEABQEBAQEBAQAAAAAADAAAAAAGAAkAAAwAtADEAAAE1MxUDKwI1OwI9AisCNSM9AjM1OwMVKwIdAjsCFTMdAiMVJSM1MwFAQIBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQP8AQEABwEBA/kBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAEAAAAAAYACQAAhAAABNSMdBysBPQcjFSM9ATsFHQEBQEBAQEBAQEBAQEBAAcBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAAAAAEAAAAAAYACQAAtAAAhKwI1Iz0HOwEdBzsBPQc7AR0HIxUBAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAEAAAAAAYACQAArAAAzIzUjPQEjPQU7AR0GOwE9BjsBHQUjHQEjFcBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAEAAAAAAkACQAA3AAAhIzUjFSsBNSM9ASM9BTsBHQYzNTM1MxUzFTM9BjsBHQUjHQEjFQGAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAABAAAAAAGAAkAAMQAAISM9AisBHQIrAT0CMzUzNSM1Iz0COwEdAjsBPQI7AR0CIxUjFTMVMx0CAUBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAABAAAAAAGAAkAAJQAAMyM9AyM1Iz0DOwEdAzsBPQM7AR0DIxUjHQPAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAEAAAAAAYACQAAtAAAhKwQ9AjM1MzUzNTM1KwM9ATsFHQIjFSMVIxUjFTsDHQEBQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAEAAP+AAMADAAAjAAAXKwE9DTsCFSMdCzMVgEBAQEBAQECAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAABAAD/wAGAAwAAJQAABT0BIz0BIz0BIz0BIz0BIz0CMx0BMx0BMx0BMx0BMx0BMx0CAUBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAEAAP+AAMADAAAjAAAXKwE1Mz0LIzU7Ah0NgEBAQEBAQECAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAABAAABAAGAAkAAGwAAASM9AisBHQIrAT0BMz0BMzU7ARUzHQEzHQEBQEBAQEBAQEBAQEBAAQBAQEBAQEBAQEBAQEBAQEBAAAABAAD/wAGAAAAADQAAITMVKwU1OwMBQEBAQEBAQEBAQEBAQEAAAAAAAgAAAYABAAJAAAMADQAAEzUzFScrATUjNTsBFTPAQEBAQEBAQEABgEBAQEBAQAAAAgAAAAABgAHAACMAKwAAISsDNSM9ATM1OwI9ASsBFSsBNTM1OwMVMx0FJzM9ASsBHQEBQEBAQEBAQEBAQEBAQEBAQEBAQEDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAAAAAIAAAAAAYACQAAdACsAACErAz0IOwEdATsCFTMdBCMVJzM9BCsBHQQBAEBAQEBAQEBAQEBAgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAABAAAAAAGAAcAAJQAAISsCNSM9BDM1OwMVMxUrATUrAR0EOwE1OwEVIxUBAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAACAAAAAAGAAkAAHQArAAAhKwM1Iz0EMzU7Aj0BOwEdCCczPQQrAR0EAUBAQEBAQEBAQEBAQMBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAgAAAAABgAHAACMAKwAAISsCNSM9BDM1OwMVMx0CKwMdATsBNTsBFSMVAzM9ASsBHQEBAEBAQEBAQEBAQEBAQEBAQEBAQECAQEBAQEBAQEBAQEBAQEBAQEBAQAEAQEBAQAAAAAEAAP9AAYACQAArAAAXIzUzPQYjNTM9ATM1OwIVMxUrATUjHQE7ARUrAR0GIxVAQEBAQEBAQEBAQEBAQEBAQEDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAgAA/0ABgAHAACkANwAABSsCNSM1OwEVOwE9ASsCNSM9BDM1OwQdCCMVAzM9BCsBHQQBAEBAQEBAQEBAQEBAQEBAQEBAQECAQEBAwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEABAEBAQEBAQEBAQEAAAAEAAAAAAYACQAApAAAhIz0FKwEdBSsBPQg7AR0BOwIVMx0FAUBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAgAAAAAAgAJAAA8AFwAAMyM9BTsBHQUDIz0BOwEdAUBAQEBAQEBAQEBAQEBAQEBAQEBAAcBAQEBAAAAAAgAA/0AAwAJAABcAHwAAFT0BMz0GOwEdBiMVIxUTIz0BOwEdAUBAQEBAQEBAQMBAQEBAQEBAQEBAQEBAQEBAQEACgEBAQEAAAQAAAAABgAJAAC0AACEjPQEjNSMdAisBPQg7AR0EMzUzPQE7AR0BIxUjFTMVMx0BAUBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAQAAAAAAwAJAABcAADMjNSM9BzsBHQczFYBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAEAAAAAAoABwAA9AAAhIz0FIxUjHQQrAT0FIxUjHQQrAT0GOwEVMzU7ARU7ATU7ARUzHQUCQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAQAAAAABgAHAACcAACEjPQUjFSMdBCsBPQY7ARUzNTsBFTMdBQFAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAACAAAAAAGAAcAAGQAnAAAhKwI1Iz0EMzU7AxUzHQQjFSczPQQrAR0EAQBAQEBAQEBAQEBAQIBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAACAAD/QAGAAcAAHwAtAAAXIz0JOwQVMx0EIxUrAh0CEzM9BCsBHQRAQEBAQEBAQEBAQEBAQEBAwEBAQEBAQEBAQEBAQEBAQEBAQEBAAQBAQEBAQEBAQEBAAAAAAAIAAP9AAYABwAAfAC0AAAUjPQIrAjUjPQQzNTsEHQkDMz0EKwEdBAFAQEBAQEBAQEBAQEDAQEBAwEBAQEBAQEBAQEBAQEBAQEBAQEBAAQBAQEBAQEBAQEBAAAAAAQAAAAABgAHAAB0AADMjPQY7ARUzNTsBFTMdASsBNSsBHQRAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAADAAAAAAGAAcAAAwApAC0AAAE1MxUDKwI1OwI9ASsCNSM9ATM1OwMVKwIdATsCFTMdASMVJSM1MwFAQIBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQP8AQEABQEBA/sBAQEBAQEBAQEBAQEBAQEBAAAAAAQAAAAABgAJAACMAACErATUjPQQjNTM9ATsBHQE7ARUrAR0EMzU7ARUjFQEAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAAAAQAAAAABgAHAACUAACErAjUjPQU7AR0FOwE9BTsBHQUjFQEAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAEAAAAAAYABwAAjAAAzIzUjPQEjPQM7AR0EOwE9BDsBHQMjHQEjFcBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAABAAAAAAJAAcAALwAAISM1IxUrATUjPQEjPQM7AR0EMzUzNTMVMxUzPQQ7AR0DIx0BIxUBgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAAAAAEAAAAAAYABwAApAAAhIz0BKwEdASsBPQEzNTM1IzUjPQE7AR0BOwE9ATsBHQEjFSMVMxUzHQEBQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAABAAD/QAGAAcAANQAABSsCNSM1OwEVOwE9ASsCNSM9BTsBHQU7AT0FOwEdCCMVAQBAQEBAQEBAQEBAQEBAQEBAQEBAwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAEAAAAAAYABwAAlAAAhKwQ9ATM1MzUzNSsCPQE7BR0BIxUjFSMVOwIdAQFAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAEAAP+AAYADAAAtAAAFIzUjNSM9BCsBNTsBPQMzNTM1OwEVIxUjHQMjFTMdBDMVMxUBQEBAQEBAQEBAQEBAQEBAQEBAgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAABAAD/gACAAwAAHwAAFyM9DTsBHQ1AQEBAgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAEAAP+AAYADAAAtAAAXIzUzNTM9BDM1Iz0DIzUjNTsBFTMVMx0DOwEVKwEdBCMVIxVAQEBAQEBAQEBAQEBAQEBAQECAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAABAAABAAKAAcAAIQAAASsBNSM1IxUjFSsBNTM1MzU7AhUzFTM1MzU7ARUjFSMVAcBAQEBAQEBAQEBAQEBAQEBAQEBAAQBAQEBAQEBAQEBAQEBAQAACAAAAAACAAkAADwAXAAAzIz0EMzUzHQUDIz0BOwEdAUBAQEBAQEBAQEBAQEBAQEBAQEBAAcBAQEBAAAACAAD/gAHAAkAALQA5AAAXPQErATUjPQQzNTsBPQEzHQE7ARUzFSsBNSMdBDM1OwEVIxUrAR0BJz0EIx0EwEBAQEBAQEBAQEBAQEBAQEBAQEBAQIBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQMBAQEBAQEBAQEBAAAAAAQAAAAABwAJAADUAACErBDUzPQIjNTM9AjM1OwMVMxUjFSsBNTM1KwEdAjsBFSsBHQI7ATU7ARUjFQFAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAAAJAAAAAAJAAkAAAwAHAAsAKwA3ADsAPwBDAEcAACE1MxUhNTMVJSM1MwcrATUjFSM1MzUjPQIzNTM1OwIVMxUzHQIjFSMVJzM9AisCHQIzEzUzFSEjNTMhNTMVISM1MwIAQP3AQAHAQEDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAwED+gEBAAYBA/gBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAgEBAQEBAQAEAQEBAQEBAAAABAAAAAAGAAkAAMwAAMyM1KwE1OwE1KwE1OwE1IzUjPQI7AR0COwE9AjsBHQIjFSMVOwEVKwEVOwEVKwEVwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQAAAAAIAAP+AAIADAAAPAB8AABcjPQU7AR0FAyM9BTsBHQVAQEBAQEBAQIBAQEBAQEBAQEBAQEACAEBAQEBAQEBAQEBAQAAABAAA/wABgAJAAAMAOQA9AEcAAAE1MxUDKwI1OwI9AisCNSM9AjM1Iz0CMzU7AxUrAh0COwIVMx0CIxUzHQIjFSUjNTM3Mz0CKwEdAgFAQIBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQED/AEBAgEBAQAHAQED9QEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEDAQEBAQEBAAAAAAAEAAAAAAcACQAA1AAAhKwI1Iz0BIzUzNSM1Mz0BMzU7AxUzFSsBNSsBHQE7ARUrARU7ARUrAR0BOwE1OwEVIxUBQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAAAAADgCuAAEAAAAAAAAADwAgAAEAAAAAAAEABQA8AAEAAAAAAAIABgBQAAEAAAAAAAMAFQCDAAEAAAAAAAQABQClAAEAAAAAAAUAEADNAAEAAAAAAAYABQDqAAMAAQQJAAAAHgAAAAMAAQQJAAEACgAwAAMAAQQJAAIADABCAAMAAQQJAAMAKgBXAAMAAQQJAAQACgCZAAMAAQQJAAUAIACrAAMAAQQJAAYACgDeAFIAdQB0AGgAZQByAGYAbwByAGQAQwByAGEAegBlAABSdXRoZXJmb3JkQ3JhemUAAFQAbwBwAGkAYwAAVG9waWMAAE0AZQBkAGkAdQBtAABNZWRpdW0AAFIAdQB0AGgAZQByAGYAbwByAGQAQwByAGEAegBlADoAVABvAHAAaQBjAABSdXRoZXJmb3JkQ3JhemU6VG9waWMAAFQAbwBwAGkAYwAAVG9waWMAAFYAZQByAHMAaQBvAG4AIAAwADAAMQAuADAAMAAwACAAAFZlcnNpb24gMDAxLjAwMCAAAFQAbwBwAGkAYwAAVG9waWMAAAAAAgAAAAAAAP+AADMAAAAAAAAAAAAAAAAAAAAAAAAAAABsAAAAAQACAAMABAAFAAYABwAIAAkACgALAAwADQAOAA8AEAARABIAEwAUABUAFgAXABgAGQAaABsAHAAdAB4AHwAgACEAIgAjACQAJQAmACcAKAApACoAKwAsAC0ALgAvADAAMQAyADMANAA1ADYANwA4ADkAOgA7ADwAPQA+AD8AQABBAEIAQwBEAEUARgBHAEgASQBKAEsATABNAE4ATwBQAFEAUgBTAFQAVQBWAFcAWABZAFoAWwBcAF0AXgBfAGAAYQECAKMAhACFAL0AlgDoAIYBAwEEB3VuaTAwQTAERXVybwd1bmkzMDAwAAAAAAH//wAAAAEAAAAOAAAAGAAgAAAAAgABAAEAawABAAQAAAACAAAAAQAAAAEAAAAAAAEAAAAAx/6w3wAAAADIeCtBAAAAANsfavI=";
+   }
+}
