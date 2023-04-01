@@ -1,2 +1,2 @@
-# charlie-the-chimp
+# Charlie the Chimp
 Text adventure written using Adventuron
