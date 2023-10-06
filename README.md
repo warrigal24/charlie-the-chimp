@@ -10,8 +10,7 @@ Fortunately for you, the gorilla is currently asleep. You need to find your way 
 
 Or maybe you'll have to wake him. That's for you to work out.
 
-This is a traditional text adventure that was originally written for [The Next Adventure Jam](https://itch.io/jam/next-adventure-jam), 6 June to 5 July 2020. The game can be played at [Charlie the Chimp](https://warrigal.itch.io/charlie-the-chimp).
-
+This is a traditional text adventure that was originally written for [The Next Adventure Jam](https://itch.io/jam/next-adventure-jam), 6 June to 5 July 2020.
 ## Release notes
 
 Version 1.0.0 was written and compiled using [Adventuron Classroom](https://adventuron.io/classroom/) 1.0.0 beta 45. You may need to make changes if using a later version of Adventuron.
